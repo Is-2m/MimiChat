@@ -2,26 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/utils/Navigation.dart';
-import 'package:mimichat/views/pages/auth/RegisterPage.dart';
+import 'package:mimichat/views/pages/auth/LoginPage.dart';
 import 'package:mimichat/views/pages/home/HomePage.dart';
 import 'package:mimichat/views/widgets/AuthCustomButton.dart';
 import 'package:mimichat/views/widgets/AuthInputField.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class Registerpage extends StatefulWidget {
+  const Registerpage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<Registerpage> createState() => _RegisterpageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterpageState extends State<Registerpage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  TextEditingController _usernameController = TextEditingController();
   bool isChecked = false;
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
@@ -34,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Center(
               child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -59,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 40,
                 ),
                 Text(
-                  "Sign in",
+                  "Sign up",
                   style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.w600,
@@ -69,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 5,
                 ),
                 Text(
-                  "Sign in to continue to MimiChat.",
+                  "Get your MimiChat account now.",
                   style: TextStyle(color: Color(0xFF8B8FA7)),
                 ),
                 Container(
@@ -90,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                           Row(
                             children: [
                               Text(
-                                "Username or Email",
+                                "Username",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 16,
@@ -100,7 +102,29 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           SizedBox(height: 10),
                           AuthInputField(
-                            hintText: "Username or Email",
+                            hintText: "Username",
+                            type: TextInputType.text,
+                            onChanged: (val) {},
+                            onSubmitted: (val) {},
+                            controller: _usernameController,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Email",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          AuthInputField(
+                            hintText: "Email",
                             type: TextInputType.emailAddress,
                             onChanged: (val) {},
                             onSubmitted: (val) {},
@@ -119,19 +143,6 @@ class _LoginPageState extends State<LoginPage> {
                                   fontSize: 16,
                                 ),
                               ),
-                              MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: GestureDetector(
-                                  child: Text(
-                                    "Forgot Password?",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      color: CustomColors.purpple,
-                                    ),
-                                  ),
-                                ),
-                              )
                             ],
                           ),
                           SizedBox(height: 10),
@@ -188,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: AuthCustomButton(
                                 color: CustomColors.purpple,
-                                label: "Sign in",
+                                label: "Sign up",
                                 onPressed: () {
                                   Navigation.pushReplacement(
                                       context, Homepage());
@@ -207,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Don't have an account?",
+                      "Already have an account ?",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                       ),
@@ -219,10 +230,10 @@ class _LoginPageState extends State<LoginPage> {
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
                         onTap: () {
-                          Navigation.pushReplacement(context, Registerpage());
+                          Navigation.pushReplacement(context, LoginPage());
                         },
                         child: Text(
-                          "Sign up",
+                          "Sign in",
                           style: TextStyle(
                             color: CustomColors.purpple,
                             fontWeight: FontWeight.w600,
