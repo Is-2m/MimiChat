@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:mimichat/services/AuthService.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/utils/Navigation.dart';
 import 'package:mimichat/views/pages/auth/LoginPage.dart';
@@ -19,6 +20,32 @@ class _RegisterpageState extends State<Registerpage> {
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _usernameController = TextEditingController();
   bool isChecked = false;
+
+  void _signUp(
+      BuildContext ctx, String username, String email, String password) async {
+    if (email.isNotEmpty && password.isNotEmpty) {
+      await AuthService.register(username, email, password).then((val) {
+        if (val != null) {
+          Navigation.pushReplacement(
+              ctx,
+              Homepage(
+                selectedIndex: 2,
+              ));
+        } else {
+          ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+            content: Text("An error occured"),
+            backgroundColor: Colors.redAccent,
+          ));
+        }
+      });
+    } else {
+      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+        content: Text("Please fill all fields"),
+        backgroundColor: Colors.redAccent,
+      ));
+    }
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -105,7 +132,11 @@ class _RegisterpageState extends State<Registerpage> {
                             hintText: "Username",
                             type: TextInputType.text,
                             onChanged: (val) {},
-                            onSubmitted: (val) {},
+                            onSubmitted: (val) => _signUp(
+                                context,
+                                _usernameController.text,
+                                _emailController.text,
+                                _passwordController.text),
                             controller: _usernameController,
                           ),
                           SizedBox(
@@ -127,7 +158,11 @@ class _RegisterpageState extends State<Registerpage> {
                             hintText: "Email",
                             type: TextInputType.emailAddress,
                             onChanged: (val) {},
-                            onSubmitted: (val) {},
+                            onSubmitted: (val) => _signUp(
+                                context,
+                                _usernameController.text,
+                                _emailController.text,
+                                _passwordController.text),
                             controller: _emailController,
                           ),
                           SizedBox(
@@ -150,7 +185,11 @@ class _RegisterpageState extends State<Registerpage> {
                             hintText: "password",
                             type: TextInputType.visiblePassword,
                             onChanged: (val) {},
-                            onSubmitted: (val) {},
+                            onSubmitted: (val) => _signUp(
+                                context,
+                                _usernameController.text,
+                                _emailController.text,
+                                _passwordController.text),
                             controller: _passwordController,
                             isPassword: true,
                           ),
@@ -198,12 +237,14 @@ class _RegisterpageState extends State<Registerpage> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: AuthCustomButton(
-                                color: CustomColors.purpple,
-                                label: "Sign up",
-                                onPressed: () {
-                                  Navigation.pushReplacement(
-                                      context, Homepage());
-                                }),
+                              color: CustomColors.purpple,
+                              label: "Sign up",
+                              onPressed: () => _signUp(
+                                  context,
+                                  _usernameController.text,
+                                  _emailController.text,
+                                  _passwordController.text),
+                            ),
                           ),
                         ],
                       ),

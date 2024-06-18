@@ -1,21 +1,48 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:mimichat/models/User.dart';
+import 'package:mimichat/services/ImageService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStateManager {
-  static final String apiURL = "http://localhost:8080/api/";
-
-
+  static final String apiURL = "http://localhost:8080/api";
 
   static SharedPreferences? _cache;
   static final String _currentUser_CacheName = "currentUser";
   static final String _CACHE_NAME = "app_state_cache";
-  static User? currentUser;
 
-  static saveCurrentUser(User user) {
-    currentUser = user;
-    _cache!.setString(_currentUser_CacheName, jsonEncode(user.toJson()));
+  static User? currentUser;
+  static Widget? currentPdp;
+
+  static saveCurrentUser(User? user) {
+    if (user != null) {
+      currentUser = user;
+      _cache!.setString(_currentUser_CacheName, jsonEncode(user.toJson()));
+      currentPdp = FutureBuilder<Uint8List?>(
+          future: ImageService.getImage(currentUser!.profilePicture!),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return CircleAvatar(
+                child: Icon(Icons.error),
+              );
+            } else if (snapshot.hasData) {
+              return CircleAvatar(
+                backgroundImage: MemoryImage(snapshot.data!),
+              );
+            } else {
+              return CircleAvatar(
+                child: Icon(Icons.person),
+              );
+            }
+          });
+    } else {
+      currentUser = null;
+      _cache!.setString(_currentUser_CacheName, "null");
+    }
   }
 
   static Future<User?> getCurrentUser() async {

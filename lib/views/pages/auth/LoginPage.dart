@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:mimichat/dao/AuthDAO.dart';
+import 'package:mimichat/models/User.dart';
+import 'package:mimichat/services/AuthService.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/utils/Navigation.dart';
 import 'package:mimichat/views/pages/auth/RegisterPage.dart';
@@ -18,6 +21,27 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool isChecked = false;
+  void _SignIn(BuildContext ctx, String email, String password) async {
+    if (email.isNotEmpty && password.isNotEmpty) {
+      AuthService.login(email, password).then((value) {
+        if (value != null) {
+          Navigation.pushReplacement(ctx, Homepage());
+        } else {
+          print("Invalid email or password");
+          ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+            content: Text("Invalid email or password"),
+            backgroundColor: Colors.redAccent,
+          ));
+        }
+      });
+    } else {
+      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+        content: Text("Please fill all fields"),
+        backgroundColor: Colors.redAccent,
+      ));
+    }
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -90,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                           Row(
                             children: [
                               Text(
-                                "Username or Email",
+                                "Email",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 16,
@@ -100,10 +124,13 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           SizedBox(height: 10),
                           AuthInputField(
-                            hintText: "Username or Email",
+                            hintText: "Email",
                             type: TextInputType.emailAddress,
                             onChanged: (val) {},
-                            onSubmitted: (val) {},
+                            onSubmitted: (val) => _SignIn(
+                                context,
+                                _emailController.text,
+                                _passwordController.text),
                             controller: _emailController,
                           ),
                           SizedBox(
@@ -139,7 +166,10 @@ class _LoginPageState extends State<LoginPage> {
                             hintText: "password",
                             type: TextInputType.visiblePassword,
                             onChanged: (val) {},
-                            onSubmitted: (val) {},
+                            onSubmitted: (val) => _SignIn(
+                                context,
+                                _emailController.text,
+                                _passwordController.text),
                             controller: _passwordController,
                             isPassword: true,
                           ),
@@ -187,12 +217,13 @@ class _LoginPageState extends State<LoginPage> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: AuthCustomButton(
-                                color: CustomColors.purpple,
-                                label: "Sign in",
-                                onPressed: () {
-                                  Navigation.pushReplacement(
-                                      context, Homepage());
-                                }),
+                              color: CustomColors.purpple,
+                              label: "Sign in",
+                              onPressed: () => _SignIn(
+                                  context,
+                                  _emailController.text,
+                                  _passwordController.text),
+                            ),
                           ),
                         ],
                       ),

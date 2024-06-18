@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:mimichat/services/ImageService.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 
 class LeftChatBubble extends StatefulWidget {
@@ -7,12 +10,14 @@ class LeftChatBubble extends StatefulWidget {
   final String message;
   final String time;
   final bool isExpanded;
-
+  Widget? imgWidget;
+  
   LeftChatBubble({
     required this.img,
     required this.message,
     required this.time,
     required this.isExpanded,
+    this.imgWidget,
   });
 
   @override
@@ -41,11 +46,27 @@ class _LeftChatBubbleState extends State<LeftChatBubble> {
         children: [
           Container(
             padding: EdgeInsets.only(top: 50),
-            child: CircleAvatar(
-              maxRadius: 18,
-              minRadius: 10,
-              backgroundImage: AssetImage('${widget.img}'),
-            ),
+            child: widget.imgWidget != null
+                ? widget.imgWidget
+                : FutureBuilder<Uint8List?>(
+                    future: ImageService.getImage(widget.img),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return CircleAvatar(
+                          child: Icon(Icons.error),
+                        );
+                      } else if (snapshot.hasData) {
+                        return CircleAvatar(
+                          backgroundImage: MemoryImage(snapshot.data!),
+                        );
+                      } else {
+                        return CircleAvatar(
+                          child: Icon(Icons.person),
+                        );
+                      }
+                    }),
           ),
           SizedBox(
             width: 15,

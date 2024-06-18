@@ -39,7 +39,12 @@ dependencies:
   emoji_picker_flutter:
   provider:
   shared_preferences:
+  url_launcher:
+  http:
+  file_picker:
+  timeago:
 
+  # intl_phone_number_input:
 
 dev_dependencies:
   flutter_test:

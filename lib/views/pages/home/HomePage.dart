@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:mimichat/models/Chat.dart';
+import 'package:mimichat/providers/ChatProvider.dart';
+import 'package:mimichat/services/AuthService.dart';
 import 'package:mimichat/utils/CustomColors.dart';
+import 'package:mimichat/utils/Navigation.dart';
+import 'package:mimichat/views/pages/auth/LoginPage.dart';
 import 'package:mimichat/views/pages/home/ChatListPage.dart';
 import 'package:mimichat/views/pages/home/ContactsPage.dart';
 import 'package:mimichat/views/pages/home/ConversationPage.dart';
 import 'package:mimichat/views/pages/home/ProfilePage.dart';
+import 'package:provider/provider.dart';
 
 class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+  int? selectedIndex = 0;
+  Homepage({this.selectedIndex});
 
   @override
   State<Homepage> createState() => _HomepageState();
@@ -15,40 +22,32 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   int _selectedIndex = 0;
-  bool _showChat = false;
+  Chat? currentChat;
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  void _closeChat() {
-    setState(() {
-      _showChat = false;
-    });
-  }
 
-  void _openChat() {
-    setState(() {
-      _showChat = true;
-    });
-  }
+
 
   List<Widget> _pages = [];
 
   @override
   void initState() {
     super.initState();
+    _selectedIndex = widget.selectedIndex ?? 0;
     _pages = [
-      ChatListPage(openChat: _openChat),
+      ChatListPage(),
       Contactspage(),
       ProfilePage(),
     ];
   }
 
-
   @override
   Widget build(BuildContext context) {
+    ChatProvider chatProvider = Provider.of<ChatProvider>(context);
     return Scaffold(
       body: Row(
         children: [
@@ -131,7 +130,11 @@ class _HomepageState extends State<Homepage> {
                       color: Colors.redAccent,
                       size: 30,
                     ),
-                    onPressed: () => _onItemTapped(2),
+                    onPressed: () async {
+                      await AuthService.logout().then((val) {
+                        Navigation.pushReplacement(context, LoginPage());
+                      });
+                    },
                   ),
                 ),
               ],
@@ -144,10 +147,8 @@ class _HomepageState extends State<Homepage> {
           ),
           Expanded(
             flex: 5,
-            child: _showChat
-                ? ConversationPage(
-                    onExit: _closeChat,
-                  )
+            child: chatProvider.showChat
+                ? ConversationPage()
                 : Container(
                     color:
                         Color(0xFFF7F7FF), // Placeholder for additional content

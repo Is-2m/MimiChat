@@ -1,10 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:mimichat/views/widgets/AuthInputField.dart';
+import 'package:mimichat/models/Chat.dart';
+import 'package:mimichat/models/User.dart';
+import 'package:mimichat/services/ChatService.dart';
+import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/views/widgets/ChatListItem.dart';
 
 class ChatListPage extends StatefulWidget {
-  final VoidCallback openChat;
-  ChatListPage({required this.openChat});
+  ChatListPage();
 
   @override
   State<ChatListPage> createState() => _ChatListPageState();
@@ -12,6 +16,7 @@ class ChatListPage extends StatefulWidget {
 
 class _ChatListPageState extends State<ChatListPage> {
   TextEditingController _searchController = TextEditingController();
+  User currentUser = AppStateManager.currentUser!;
 
   @override
   void dispose() {
@@ -82,18 +87,25 @@ class _ChatListPageState extends State<ChatListPage> {
                   ),
                 )),
             Expanded(
-              child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return ChatListItem(
-                    name: "Name ${index}",
-                    message: "Last sent message #$index",
-                    img: "images/avatar-2.jpg",
-                    time: "0$index:00",
-                    onTap: widget.openChat,
-                  );
-                },
-              ),
+              child: FutureBuilder<List<Chat>>(
+                  future: ChatService.getChats(currentUser.id),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<Chat> chats = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: chats.length,
+                        itemBuilder: (context, index) {
+                          return ChatListItem(
+                            chat: chats[index],
+                          );
+                        },
+                      );
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  }),
             ),
           ],
         ));

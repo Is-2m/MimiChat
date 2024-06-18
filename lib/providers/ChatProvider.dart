@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:mimichat/models/Chat.dart';
 
 class ChatProvider with ChangeNotifier {
-  // List<Chat> _chats = [
-  //   Chat(id: '1', name: 'Chat 1', messages: [Message(sender: 'User1', text: 'Hello')]),
-  //   // Add more initial chats here
-  // ];
+  Chat? _selectedChat;
+  bool _showChat = false;
 
-  // List<Chat> get chats => _chats;
+  Chat get selectedChat => _selectedChat!;
+  bool get showChat => _showChat;
 
-  // Chat? _selectedChat;
+  void selectChat(Chat chat) {
+    _selectedChat = chat;
+    _showChat = true;
+    notifyListeners();
+    return;
+  }
 
-  // Chat? get selectedChat => _selectedChat;
+  void closeChat() {
+    _selectedChat = null;
+    _showChat = false;
+    notifyListeners();
+    return;
+  }
 
-  // void selectChat(String chatId) {
-  //   _selectedChat = _chats.firstWhere((chat) => chat.id == chatId);
-  //   notifyListeners();
-  // }
-
-  // void addMessage(String chatId, Message message) {
-  //   final chat = _chats.firstWhere((chat) => chat.id == chatId);
-  //   chat.messages.add(message);
-  //   notifyListeners();
-  // }
+  
 }

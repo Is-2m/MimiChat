@@ -1,16 +1,22 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:mimichat/models/Chat.dart';
+import 'package:mimichat/models/Message.dart';
+import 'package:mimichat/models/User.dart';
+import 'package:mimichat/providers/ChatProvider.dart';
+import 'package:mimichat/services/ImageService.dart';
+import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/views/pages/home/PersonProfile.dart';
 import 'package:mimichat/views/widgets/chat_bubble/LeftChatBubble.dart';
 import 'package:mimichat/views/widgets/chat_bubble/RightChatBubble.dart';
+import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ConversationPage extends StatefulWidget {
-  final VoidCallback onExit;
-  ConversationPage({
-    required this.onExit,
-  });
+  ConversationPage();
 
   @override
   State<ConversationPage> createState() => _ConversationPageState();
@@ -31,18 +37,33 @@ class _ConversationPageState extends State<ConversationPage> {
     super.dispose();
   }
 
-  void handleClick(String value) {
-    switch (value) {
-      case 'Close Chat':
-        widget.onExit();
-        break;
-      case 'Delete Chat':
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    ChatProvider chatProvider = Provider.of<ChatProvider>(context);
+    User currentUser = AppStateManager.currentUser!;
+    Chat chat = chatProvider.selectedChat;
+    bool isSender = currentUser.isSamePersonAs(chat.sender);
+    var img = FutureBuilder<Uint8List?>(
+        future: ImageService.getImage(isSender
+            ? chat.receiver.profilePicture!
+            : chat.sender.profilePicture!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return CircleAvatar(
+              child: Icon(Icons.error),
+            );
+          } else if (snapshot.hasData) {
+            return CircleAvatar(
+              backgroundImage: MemoryImage(snapshot.data!),
+            );
+          } else {
+            return CircleAvatar(
+              child: Icon(Icons.person),
+            );
+          }
+        });
     return LayoutBuilder(builder: (context, constraints) {
       double parentWidth = constraints.maxWidth;
 
@@ -72,15 +93,34 @@ class _ConversationPageState extends State<ConversationPage> {
                     padding: EdgeInsets.all(20),
                     child: Row(
                       children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundImage: AssetImage('images/avatar-2.jpg'),
-                        ),
+                        FutureBuilder<Uint8List?>(
+                            future: ImageService.getImage(isSender
+                                ? chat.receiver.profilePicture!
+                                : chat.sender.profilePicture!),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return CircleAvatar(
+                                  child: Icon(Icons.error),
+                                );
+                              } else if (snapshot.hasData) {
+                                return CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: MemoryImage(snapshot.data!),
+                                );
+                              } else {
+                                return CircleAvatar(
+                                  child: Icon(Icons.person),
+                                );
+                              }
+                            }),
                         SizedBox(
                           width: 10,
                         ),
                         Text(
-                          'Full Name',
+                          '${isSender ? chat.receiver.fullName : chat.sender.fullName}',
                           style: TextStyle(
                               fontSize: 17,
                               fontFamily: "PublicSans",
@@ -103,8 +143,6 @@ class _ConversationPageState extends State<ConversationPage> {
                             child: IconButton(
                               tooltip: "View Profile",
                               onPressed: () {
-                                print(
-                                    "width: ${MediaQuery.of(context).size.width}");
                                 _toggleExpanded();
                               },
                               icon: Icon(
@@ -117,7 +155,15 @@ class _ConversationPageState extends State<ConversationPage> {
                           padding: EdgeInsets.symmetric(horizontal: 10),
                           child: PopupMenuButton<String>(
                             iconColor: Colors.grey[500],
-                            onSelected: handleClick,
+                            onSelected: (String choice) {
+                              switch (choice) {
+                                case 'Close Chat':
+                                  chatProvider.closeChat();
+                                  break;
+                                case 'Delete Chat':
+                                  break;
+                              }
+                            },
                             itemBuilder: (BuildContext context) {
                               return {
                                 'Close Chat',
@@ -137,26 +183,25 @@ class _ConversationPageState extends State<ConversationPage> {
                   Flexible(
                     child: ListView.builder(
                       reverse: true,
-                      itemCount: 10,
+                      itemCount: chat.messages.length,
                       itemBuilder: (context, index) {
-                        // int finalIndex = 10 - index;
-                        var rand = Random().nextBool();
-                        return rand
+                        int reversedIndex = chat.messages.length - index - 1;
+                        Message msg = chat.messages[reversedIndex];
+
+                        return msg.idSender != currentUser.id
                             ? LeftChatBubble(
-                                img: "images/avatar-2.jpg",
-                                message: Random().nextBool()
-                                    ? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt facilisis tristique. Donec rutrum bibendum eros nec volutpat. Ut vitae rhoncus nulla. Suspendisse potenti. Cras eget mollis leo, nec fringilla diam. Nulla in ex ut sapien semper molestie. Nunc dictum arcu sit amet faucibus imperdiet. Donec venenatis tortor ac leo euismod, ac venenatis arcu malesuada. Etiam at lectus convallis, faucibus ante vitae, dignissim tortor."
-                                    : "Hello World!",
-                                time: "12:00",
+                                img: "${chat.sender.profilePicture}",
+                                message: "${msg.content}",
+                                time: "${timeago.format(msg.date)}",
                                 isExpanded: _isExpanded,
+                                imgWidget: img,
                               )
                             : RightChatBubble(
-                                img: "images/avatar-1.jpg",
-                                message: Random().nextBool()
-                                    ? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt facilisis tristique. Donec rutrum bibendum eros nec volutpat. Ut vitae rhoncus nulla. Suspendisse potenti. Cras eget mollis leo, nec fringilla diam. Nulla in ex ut sapien semper molestie. Nunc dictum arcu sit amet faucibus imperdiet. Donec venenatis tortor ac leo euismod, ac venenatis arcu malesuada. Etiam at lectus convallis, faucibus ante vitae, dignissim tortor."
-                                    : "Hello World!",
-                                time: "12:00",
+                                img: "${chat.receiver.profilePicture}",
+                                message: "${msg.content}",
+                                time: "${timeago.format(msg.date)}",
                                 isExpanded: _isExpanded,
+                                imgWidget: AppStateManager.currentPdp,
                               );
                       },
                     ),
