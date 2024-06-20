@@ -12,6 +12,7 @@ import 'package:mimichat/views/pages/home/ContactsPage.dart';
 import 'package:mimichat/views/pages/home/ConversationPage.dart';
 import 'package:mimichat/views/pages/home/ProfilePage.dart';
 import 'package:provider/provider.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 class Homepage extends StatefulWidget {
   int? selectedIndex = 0;
@@ -41,6 +42,11 @@ class _HomepageState extends State<Homepage> {
       Contactspage(),
       ProfilePage(),
     ];
+
+    AuthService.onUserLogin();
+  }
+  void a (){
+  
   }
 
   @override

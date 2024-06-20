@@ -17,6 +17,7 @@ import 'package:mimichat/views/widgets/chat_bubble/RightChatBubble.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:uuid/uuid.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 class ConversationPage extends StatefulWidget {
   ConversationPage();
@@ -227,37 +228,51 @@ Widget _mainWidget(
               ),
               width > 600 ? Spacer() : SizedBox.shrink(),
               Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: IconButton(
-                    tooltip: "Voice Call",
-                    onPressed: () {
-                      var uuid = Uuid();
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: sendCallButton(
+                    isVideoCall: false,
+                    recieverID: otherUser.id,
+                    recieverUsername: otherUser.username,
+                    onCallFinished: onSendCallInvitationFinished),
+                // IconButton(
+                //   tooltip: "Voice Call",
+                //   onPressed: () {
+                //     var uuid = Uuid();
 
-                      Navigation.push(context,
-                          CallPage(isVideoCall: false, callID: uuid.v4()));
-                    },
-                    icon: Icon(
-                      Icons.phone_outlined,
-                      size: 25,
-                      color: Colors.grey[500],
-                    ),
-                  )),
+                //     Navigation.push(context,
+                //         CallPage(isVideoCall: false, callID: uuid.v4()));
+                //   },
+                //   icon: Icon(
+                //     Icons.phone_outlined,
+                //     size: 25,
+                //     color: Colors.grey[500],
+                //   ),
+                // )
+              ),
               Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: IconButton(
-                    tooltip: "Video Call",
-                    onPressed: () {
-                      var uuid = Uuid();
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: sendCallButton(
+                    isVideoCall: true,
+                    recieverID: otherUser.id,
+                    recieverUsername: otherUser.username,
+                    onCallFinished: onSendCallInvitationFinished),
+              ),
+              // Container(
+              //     padding: EdgeInsets.symmetric(horizontal: 10),
+              //     child: IconButton(
+              //       tooltip: "Video Call",
+              //       onPressed: () {
+              //         var uuid = Uuid();
 
-                      Navigation.push(context,
-                          CallPage(isVideoCall: true, callID: uuid.v4()));
-                    },
-                    icon: Icon(
-                      Icons.videocam_outlined,
-                      size: 25,
-                      color: Colors.grey[500],
-                    ),
-                  )),
+              //         Navigation.push(context,
+              //             CallPage(isVideoCall: true, callID: uuid.v4()));
+              //       },
+              //       icon: Icon(
+              //         Icons.videocam_outlined,
+              //         size: 25,
+              //         color: Colors.grey[500],
+              //       ),
+              //     )),
               Container(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: IconButton(
@@ -393,4 +408,69 @@ Widget _mainWidget(
       )
     ],
   );
+}
+
+Widget sendCallButton({
+  required bool isVideoCall,
+  required String recieverID,
+  required String recieverUsername,
+  void Function(String code, String message, List<String>)? onCallFinished,
+}) {
+  final invitees = [
+    ZegoUIKitUser(
+      id: recieverID,
+      name: recieverID,
+    )
+  ];
+
+  return ZegoSendCallInvitationButton(
+    isVideoCall: isVideoCall,
+    invitees: invitees,
+    resourceID: 'zego_data',
+    iconSize: const Size(40, 40),
+    buttonSize: const Size(50, 50),
+    clickableBackgroundColor: Colors.transparent,
+    clickableTextColor: Colors.grey[500],
+    onPressed: onCallFinished,
+  );
+}
+
+void onSendCallInvitationFinished(
+  String code,
+  String message,
+  List<String> errorInvitees,
+  // BuildContext ctx,
+) {
+  if (errorInvitees.isNotEmpty) {
+    var userIDs = '';
+    for (var index = 0; index < errorInvitees.length; index++) {
+      if (index >= 5) {
+        userIDs += '... ';
+        break;
+      }
+
+      final userID = errorInvitees.elementAt(index);
+      userIDs += '$userID ';
+    }
+    if (userIDs.isNotEmpty) {
+      userIDs = userIDs.substring(0, userIDs.length - 1);
+    }
+
+    var message = "User doesn't exist or is offline: $userIDs";
+    if (code.isNotEmpty) {
+      message += ', code: $code, message:$message';
+    }
+
+    print("$message");
+    // ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+    //   content: Text("$message"),
+    //   backgroundColor: Colors.redAccent,
+    // ));
+  } else if (code.isNotEmpty) {
+    print("code: $code, message:$message");
+    // ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+    //   content: Text('code: $code, message:$message'),
+    //   backgroundColor: Colors.redAccent,
+    // ));
+  }
 }
