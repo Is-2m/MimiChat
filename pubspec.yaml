@@ -49,10 +49,13 @@ dependencies:
   web_socket_channel:
   # zego_express_engine: ^3.15.1+2
 
-  zego_uikit_signaling_plugin: ^1.4.0
-  zego_uikit_prebuilt_call: ^1.4.2
+  # zego_uikit_signaling_plugin: ^1.4.0
+  # zego_uikit_prebuilt_call: ^1.4.2
   # zego_uikit_signaling_plugin:
   # zego_uikit_prebuilt_call:
+  zego_uikit_prebuilt_call: ^4.12.3
+  uuid:
+
   # intl_phone_number_input:
 
 dev_dependencies:

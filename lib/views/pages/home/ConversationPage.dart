@@ -9,12 +9,14 @@ import 'package:mimichat/providers/ChatProvider.dart';
 import 'package:mimichat/services/ImageService.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/utils/CustomColors.dart';
+import 'package:mimichat/utils/Navigation.dart';
+import 'package:mimichat/views/pages/call/CallPage.dart';
 import 'package:mimichat/views/pages/home/PersonProfile.dart';
 import 'package:mimichat/views/widgets/chat_bubble/LeftChatBubble.dart';
 import 'package:mimichat/views/widgets/chat_bubble/RightChatBubble.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+import 'package:uuid/uuid.dart';
 
 class ConversationPage extends StatefulWidget {
   ConversationPage();
@@ -58,11 +60,12 @@ class _ConversationPageState extends State<ConversationPage> {
   Widget build(BuildContext context) {
     ChatProvider chatProvider = Provider.of<ChatProvider>(context);
     User currentUser = AppStateManager.currentUser!;
-    Chat chat = chatProvider.selectedChat;
-    bool isSender = currentUser.isSamePersonAs(chat.sender);
+    Chat chat = chatProvider.selectedChat!;
 
     User otherUser =
         chat.sender.id == currentUser.id ? chat.receiver : chat.sender;
+
+    double width = MediaQuery.of(context).size.width;
     return LayoutBuilder(builder: (context, constraints) {
       double parentWidth = constraints.maxWidth;
 
@@ -77,221 +80,317 @@ class _ConversationPageState extends State<ConversationPage> {
             )),
         child: Row(
           children: [
-            Expanded(
-              flex: _isExpanded ? 3 : 4, // Adjust flex values to split space
-              child: Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey[200]!,
-                        width: 1,
-                      ),
-                    )),
-                    padding: EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        FutureBuilder<Uint8List?>(
-                            future: ImageService.getImage(
-                                otherUser.profilePicture!),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return CircleAvatar(
-                                  child: Icon(Icons.error),
-                                );
-                              } else if (snapshot.hasData) {
-                                return CircleAvatar(
-                                  radius: 20,
-                                  backgroundImage: MemoryImage(snapshot.data!),
-                                );
-                              } else {
-                                return CircleAvatar(
-                                  child: Icon(Icons.person),
-                                );
-                              }
-                            }),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          '${otherUser.fullName}',
-                          style: TextStyle(
-                              fontSize: 17,
-                              fontFamily: "PublicSans",
-                              fontWeight: FontWeight.w600),
-                        ),
-                        Spacer(),
-                        
-                        Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: IconButton(
-                              tooltip: "Call",
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.phone_outlined,
-                                size: 25,
-                                color: Colors.grey[500],
-                              ),
-                            )),
-                        Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: IconButton(
-                              tooltip: "View Profile",
-                              onPressed: () {
-                                _toggleExpanded();
-                              },
-                              icon: Icon(
-                                Icons.person_outline,
-                                size: 25,
-                                color: Colors.grey[500],
-                              ),
-                            )),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: PopupMenuButton<String>(
-                            iconColor: Colors.grey[500],
-                            onSelected: (String choice) {
-                              switch (choice) {
-                                case 'Close Chat':
-                                  chatProvider.closeChat();
-                                  break;
-                                case 'Delete Chat':
-                                  break;
-                              }
-                            },
-                            itemBuilder: (BuildContext context) {
-                              return {
-                                'Close Chat',
-                                'Delete Chat',
-                              }.map((String choice) {
-                                return PopupMenuItem<String>(
-                                  value: choice,
-                                  child: Text(choice),
-                                );
-                              }).toList();
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Flexible(
-                    child: ListView.builder(
-                      reverse: true,
-                      itemCount: chatProvider.selectedChat.messages.length,
-                      itemBuilder: (context, index) {
-                        int reversedIndex = chat.messages.length - index - 1;
-                        Message msg = chat.messages[reversedIndex];
-                        bool amISender = msg.sender.isSamePersonAs(currentUser);
-                        return amISender
-                            ? RightChatBubble(
-                                img: "${msg.sender.profilePicture}",
-                                message: "${msg.content}",
-                                time: "${timeago.format(msg.date)}",
-                                isExpanded: _isExpanded,
-                              )
-                            : LeftChatBubble(
-                                img: "${msg.sender.profilePicture}",
-                                message: "${msg.content}",
-                                time: "${timeago.format(msg.date)}",
-                                isExpanded: _isExpanded,
-                              );
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 3,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        border: Border(
-                      top: BorderSide(
-                        color: CustomColors.BG_Grey,
-                        width: 1.5,
-                      ),
-                    )),
-                    // padding: EdgeInsets.all(10),
-                    child: Row(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 20),
-                          width: parentWidth * (_isExpanded ? .45 : .85),
-                          child: TextField(
-                            controller: _messageController,
-                            onSubmitted: (val) {
-                              sendMessage(_messageController.text, currentUser,
-                                  otherUser, chat.id);
-                            },
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Color(0xFFE6EBF5),
-                              hintText: "Enter Message...",
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 10),
-                              hintStyle: TextStyle(fontWeight: FontWeight.w400),
-                              enabledBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                  borderSide: BorderSide(
-                                      color: Color(0xffe6ebf5),
-                                      style: BorderStyle.solid,
-                                      width: 0)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                  borderSide: BorderSide(
-                                      color: Color(0xffe6ebf5),
-                                      style: BorderStyle.solid,
-                                      width: 0)),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: CustomColors.purpple,
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                          child: IconButton(
-                              color: Colors.white,
-                              onPressed: () {
-                                sendMessage(_messageController.text,
-                                        currentUser, otherUser, chat.id)
-                                    .then((val) {
-                                  if (val != null) {
-                                    chatProvider.addMessage(val);
-                                    setState(() {
-                                      _messageController.clear();
-                                    });
-                                  }
-                                });
-                              },
-                              icon: Icon(Icons.send)),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            AnimatedContainer(
-              duration: Duration(milliseconds: 300),
-              width: _isExpanded ? MediaQuery.of(context).size.width / 3.5 : 0,
-              child: _isExpanded
-                  ? PersonProfile(
-                      onPressed: _toggleExpanded,
-                    )
-                  : SizedBox.shrink(),
-            ),
+            _buildMainWidget(
+                width,
+                _isExpanded,
+                _mainWidget(
+                    chatProvider,
+                    currentUser,
+                    chat,
+                    otherUser,
+                    context,
+                    parentWidth,
+                    _isExpanded,
+                    _messageController,
+                    _toggleExpanded,
+                    sendMessage,
+                    width)),
+            _buildProfileWidget(width, _isExpanded)
           ],
         ),
       );
     });
   }
+
+  Widget _buildMainWidget(double width, bool _isExpnded, Widget org) {
+    print(
+        "_buildMainWidget is called width: $width, isExpanded: ${_isExpanded}");
+    Widget wid = Expanded(child: org);
+
+    var res = -1;
+
+    if (_isExpnded) {
+      if (width > 1000) {
+        wid = Expanded(
+          child: org,
+          flex: 3,
+        );
+
+        res = 1;
+      } else {
+        wid = SizedBox.shrink();
+        res = 2;
+      }
+    }
+
+    print("result: $res");
+    return wid;
+  }
+
+  Widget _buildProfileWidget(
+    double width,
+    bool _isExpnded,
+  ) {
+    print("_buildProfileWidget is called width: $width, chat: ${_isExpnded}");
+    Widget wid = SizedBox.shrink();
+    var res = -1;
+    if (_isExpnded) {
+      if (width > 1000) {
+        wid = AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            width: width / 3.5,
+            child: PersonProfile(
+              onPressed: _toggleExpanded,
+            ));
+        res = 2;
+      } else {
+        wid = Expanded(
+            child: AnimatedContainer(
+                duration: Duration(milliseconds: 300),
+                width: width,
+                child: PersonProfile(
+                  onPressed: _toggleExpanded,
+                )));
+        res = 3;
+      }
+    }
+    print("Result $res  ");
+    return wid;
+  }
+}
+
+Widget _mainWidget(
+  ChatProvider chatProvider,
+  User currentUser,
+  Chat chat,
+  User otherUser,
+  BuildContext context,
+  double parentWidth,
+  bool _isExpanded,
+  TextEditingController _messageController,
+  Function _toggleExpanded,
+  Function sendMessage,
+  double width,
+) {
+  return Column(
+    children: [
+      Container(
+        decoration: BoxDecoration(
+            border: Border(
+          bottom: BorderSide(
+            color: Colors.grey[200]!,
+            width: 1,
+          ),
+        )),
+        padding: EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: IconButton(
+                      onPressed: () {
+                        chatProvider.closeChat();
+                      },
+                      icon: Icon(Icons.arrow_back_ios))),
+              FutureBuilder<Uint8List?>(
+                  future: ImageService.getImage(otherUser.profilePicture!),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return CircleAvatar(
+                        child: Icon(Icons.error),
+                      );
+                    } else if (snapshot.hasData) {
+                      return CircleAvatar(
+                        radius: 20,
+                        backgroundImage: MemoryImage(snapshot.data!),
+                      );
+                    } else {
+                      return CircleAvatar(
+                        child: Icon(Icons.person),
+                      );
+                    }
+                  }),
+              SizedBox(
+                width: 5,
+              ),
+              Text(
+                '${otherUser.fullName}',
+                style: TextStyle(
+                    fontSize: 17,
+                    fontFamily: "PublicSans",
+                    fontWeight: FontWeight.w600),
+              ),
+              width > 600 ? Spacer() : SizedBox.shrink(),
+              Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: IconButton(
+                    tooltip: "Voice Call",
+                    onPressed: () {
+                      var uuid = Uuid();
+
+                      Navigation.push(context,
+                          CallPage(isVideoCall: false, callID: uuid.v4()));
+                    },
+                    icon: Icon(
+                      Icons.phone_outlined,
+                      size: 25,
+                      color: Colors.grey[500],
+                    ),
+                  )),
+              Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: IconButton(
+                    tooltip: "Video Call",
+                    onPressed: () {
+                      var uuid = Uuid();
+
+                      Navigation.push(context,
+                          CallPage(isVideoCall: true, callID: uuid.v4()));
+                    },
+                    icon: Icon(
+                      Icons.videocam_outlined,
+                      size: 25,
+                      color: Colors.grey[500],
+                    ),
+                  )),
+              Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: IconButton(
+                    tooltip: "View Profile",
+                    onPressed: () {
+                      _toggleExpanded();
+                    },
+                    icon: Icon(
+                      Icons.person_outline,
+                      size: 25,
+                      color: Colors.grey[500],
+                    ),
+                  )),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: PopupMenuButton<String>(
+                  iconColor: Colors.grey[500],
+                  onSelected: (String choice) {
+                    switch (choice) {
+                      case 'Close Chat':
+                        chatProvider.closeChat();
+                        break;
+                      case 'Delete Chat':
+                        break;
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return {
+                      'Close Chat',
+                      'Delete Chat',
+                    }.map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(choice),
+                      );
+                    }).toList();
+                  },
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+      Flexible(
+        child: ListView.builder(
+          reverse: true,
+          itemCount: chatProvider.selectedChat!.messages.length,
+          itemBuilder: (context, index) {
+            int reversedIndex = chat.messages.length - index - 1;
+            Message msg = chat.messages[reversedIndex];
+            bool amISender = msg.sender.isSamePersonAs(currentUser);
+            return amISender
+                ? RightChatBubble(
+                    img: "${msg.sender.profilePicture}",
+                    message: "${msg.content}",
+                    time: "${timeago.format(msg.date)}",
+                    isExpanded: _isExpanded,
+                  )
+                : LeftChatBubble(
+                    img: "${msg.sender.profilePicture}",
+                    message: "${msg.content}",
+                    time: "${timeago.format(msg.date)}",
+                    isExpanded: _isExpanded,
+                  );
+          },
+        ),
+      ),
+      SizedBox(
+        height: 3,
+      ),
+      Container(
+        decoration: BoxDecoration(
+            border: Border(
+          top: BorderSide(
+            color: CustomColors.BG_Grey,
+            width: 1.5,
+          ),
+        )),
+        // padding: EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                width: parentWidth * (_isExpanded ? .45 : .8),
+                child: TextField(
+                  controller: _messageController,
+                  onSubmitted: (val) {
+                    sendMessage(_messageController.text, currentUser, otherUser,
+                        chat.id);
+                  },
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Color(0xFFE6EBF5),
+                    hintText: "Enter Message...",
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                    hintStyle: TextStyle(fontWeight: FontWeight.w400),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                        borderSide: BorderSide(
+                            color: Color(0xffe6ebf5),
+                            style: BorderStyle.solid,
+                            width: 0)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                        borderSide: BorderSide(
+                            color: Color(0xffe6ebf5),
+                            style: BorderStyle.solid,
+                            width: 0)),
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              padding: width > 700 ? EdgeInsets.all(5) : EdgeInsets.all(0),
+              decoration: BoxDecoration(
+                color: CustomColors.purpple,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              child: IconButton(
+                  color: Colors.white,
+                  onPressed: () {
+                    sendMessage(_messageController.text, currentUser, otherUser,
+                            chat.id)
+                        .then((val) {});
+                  },
+                  icon: Icon(Icons.send)),
+            )
+          ],
+        ),
+      )
+    ],
+  );
 }

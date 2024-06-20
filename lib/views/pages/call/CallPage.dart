@@ -1,56 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:mimichat/utils/AppStateManager.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
-class CallPage extends StatefulWidget {
-  const CallPage({super.key});
+class CallPage extends StatelessWidget {
+  final bool isVideoCall;
+  final String callID;
 
-  @override
-  State<CallPage> createState() => _CallPageState();
-}
-
-class _CallPageState extends State<CallPage> {
-  Widget? localView;
-  Widget? remoteView;
+  const CallPage({required this.isVideoCall, required this.callID});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Call Page")),
-      body: Stack(
-        children: [
-          localView ?? Container(),
-          Positioned(
-            top: MediaQuery.of(context).size.height / 20,
-            right: MediaQuery.of(context).size.width / 20,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width / 3,
-              child: AspectRatio(
-                aspectRatio: 9.0 / 16.0,
-                child: remoteView ?? Container(color: Colors.transparent),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: MediaQuery.of(context).size.height / 20,
-            left: 0,
-            right: 0,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width / 3,
-              height: MediaQuery.of(context).size.width / 3,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(shape: const CircleBorder(), backgroundColor: Colors.red),
-                    onPressed: () => Navigator.pop(context),
-                    child: const Center(child: Icon(Icons.call_end, size: 32)),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+    return ZegoUIKitPrebuiltCall(
+      appID: AppStateManager.VVCall_ID,
+      appSign: AppStateManager.VVCall_signIn,
+      callID: callID,
+      userID: AppStateManager.currentUser!.id,
+      userName: AppStateManager.currentUser!.username,
+      config: isVideoCall
+          ? ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
+          : ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall(),
     );
   }
 }

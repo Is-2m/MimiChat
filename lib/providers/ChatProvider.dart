@@ -6,10 +6,12 @@ class ChatProvider with ChangeNotifier {
   Chat? _selectedChat;
   bool _showChat = false;
 
-  Chat get selectedChat => _selectedChat!;
+  Chat? get selectedChat => _selectedChat;
   bool get showChat => _showChat;
 
   void selectChat(Chat chat) {
+    print("selectChat ${chat == null}");
+    print(chat);
     _selectedChat = chat;
     _showChat = true;
     notifyListeners();

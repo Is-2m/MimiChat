@@ -46,6 +46,7 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     ChatProvider chatProvider = Provider.of<ChatProvider>(context);
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Row(
         children: [
@@ -140,30 +141,104 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
           // Main Content Area
-          Expanded(
-            flex: 2,
-            child: _pages[_selectedIndex],
-          ),
-          Expanded(
-            flex: 5,
-            child: chatProvider.showChat
-                ? ConversationPage()
-                : Container(
-                    color:
-                        Color(0xFFF7F7FF), // Placeholder for additional content
-                    child: Center(
-                        child: SvgPicture.asset(
-                      'images/logo.svg',
-                      width: 100,
-                      height: 100,
-                      colorFilter: ColorFilter.mode(
-                          CustomColors.purpple.withOpacity(0.5),
-                          BlendMode.srcIn),
-                    )),
-                  ),
-          ),
+
+          _buildSelectedPage(
+              width, chatProvider.selectedChat, _pages[_selectedIndex]),
+          // Expanded(
+          //   flex: 2,
+          //   child: _pages[_selectedIndex],
+          // ),
+          _buildConversationPAge(width, chatProvider.selectedChat),
+          // Expanded(
+          //   flex: 5,
+          //   child: chatProvider.showChat
+          //       ? ConversationPage()
+          //       : Container(
+          //           color:
+          //               Color(0xFFF7F7FF), // Placeholder for additional content
+          //           child: Center(
+          //               child: SvgPicture.asset(
+          //             'images/logo.svg',
+          //             width: 100,
+          //             height: 100,
+          //             colorFilter: ColorFilter.mode(
+          //                 CustomColors.purpple.withOpacity(0.5),
+          //                 BlendMode.srcIn),
+          //           )),
+          //         ),
+          // ),
         ],
       ),
     );
+  }
+
+  Widget _buildSelectedPage(double width, Chat? chat, Widget org) {
+    print("_buildSelectedPage is called width: $width, chat: ${chat == null}");
+    Widget wid = Container();
+    var res = -1;
+
+    if (chat == null) {
+      if (width > 700) {
+        wid = Expanded(
+          child: org,
+          flex: width < 1100 ? 3 : 2,
+        );
+        res = 1;
+      } else {
+        wid = Expanded(child: org);
+
+        res = 2;
+      }
+    } else {
+      if (width > 700) {
+        wid = Expanded(
+          child: org,
+          flex: 2,
+        );
+
+        res = 3;
+      }
+    }
+    print("result: $res");
+    return wid;
+  }
+
+  Widget _buildConversationPAge(double width, Chat? chat) {
+    print(
+        "_buildConversationPAge is called width: $width, chat: ${chat == null}");
+    Widget wid = Container();
+    var res = -1;
+    if (chat == null) {
+      if (width > 700) {
+        res = 1;
+        wid = Expanded(
+          child: Container(
+            color: Color(0xFFF7F7FF), // Placeholder for additional content
+            child: Center(
+                child: SvgPicture.asset(
+              'images/logo.svg',
+              width: 100,
+              height: 100,
+              colorFilter: ColorFilter.mode(
+                  CustomColors.purpple.withOpacity(0.5), BlendMode.srcIn),
+            )),
+          ),
+          flex: 5,
+        );
+      }
+    } else {
+      if (width > 700) {
+        wid = Expanded(
+          child: ConversationPage(),
+          flex: 5,
+        );
+        res = 2;
+      } else {
+        wid = Expanded(child: ConversationPage());
+        res = 3;
+      }
+    }
+    print("Result $res  ");
+    return wid;
   }
 }

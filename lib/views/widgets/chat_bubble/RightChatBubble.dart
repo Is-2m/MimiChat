@@ -10,7 +10,7 @@ class RightChatBubble extends StatefulWidget {
   final String message;
   final String time;
   final bool isExpanded;
-  
+
   RightChatBubble({
     required this.img,
     required this.message,
@@ -31,10 +31,10 @@ class _RightChatBubbleState extends State<RightChatBubble> {
     double _countWidth(String msg) {
       int length = msg.split(" ").length;
       var coff = length <= 3
-          ? .15
+          ? .4
           : length <= 10
-              ? .2
-              : .3;
+              ? .6
+              : .9;
       return widget.isExpanded ? coff * .5 : coff;
     }
 
@@ -43,75 +43,78 @@ class _RightChatBubbleState extends State<RightChatBubble> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          SizedBox(
+          Container(
+            alignment: Alignment.centerRight,
+            // color: Colors.amber,
             width:
                 MediaQuery.of(context).size.width * _countWidth(widget.message),
-            child: ChatBubble(
-              backGroundColor: CustomColors.purpple,
-              clipper:
-                  ChatBubbleClipper6(type: BubbleType.sendBubble, sizeRatio: 3),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text.rich(
-                      textAlign: TextAlign.justify,
-                      TextSpan(
-                        text: widget.message,
-                        style: TextStyle(color: textColor),
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * .3,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Icon(Icons.watch_later_outlined,
-                            size: 12, color: timeColor),
-                        SizedBox(
-                          width: 3,
-                        ),
-                        Text(
-                          "${widget.time}",
-                          style: TextStyle(
-                            color: timeColor,
-                            fontSize: 12,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ChatBubble(
+                  backGroundColor: CustomColors.purpple,
+                  clipper: ChatBubbleClipper6(
+                      type: BubbleType.sendBubble, sizeRatio: 3),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text.rich(
+                          textAlign: TextAlign.justify,
+                          TextSpan(
+                            text: widget.message,
+                            style: TextStyle(color: textColor),
                           ),
+                          softWrap: true,
                         ),
-                      ],
-                    ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * .3,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.watch_later_outlined,
+                                size: 12, color: timeColor),
+                            SizedBox(width: 3),
+                            Text(
+                              "${widget.time}",
+                              style: TextStyle(
+                                color: timeColor,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                    ],
                   ),
-                  SizedBox(
-                    height: 10,
-                  )
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           Container(
             padding: EdgeInsets.only(top: 50),
-            child:  FutureBuilder<Uint8List?>(
-                    future: ImageService.getImage(widget.img),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return CircleAvatar(
-                          child: Icon(Icons.error),
-                        );
-                      } else if (snapshot.hasData) {
-                        return CircleAvatar(
-                          backgroundImage: MemoryImage(snapshot.data!),
-                        );
-                      } else {
-                        return CircleAvatar(
-                          child: Icon(Icons.person),
-                        );
-                      }
-                    }),
+            child: FutureBuilder<Uint8List?>(
+                future: ImageService.getImage(widget.img),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return CircleAvatar(
+                      child: Icon(Icons.error),
+                    );
+                  } else if (snapshot.hasData) {
+                    return CircleAvatar(
+                      backgroundImage: MemoryImage(snapshot.data!),
+                    );
+                  } else {
+                    return CircleAvatar(
+                      child: Icon(Icons.person),
+                    );
+                  }
+                }),
           ),
           SizedBox(
             width: 15,
