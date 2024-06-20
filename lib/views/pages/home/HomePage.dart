@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/providers/ChatProvider.dart';
 import 'package:mimichat/services/AuthService.dart';
+import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/utils/Navigation.dart';
 import 'package:mimichat/views/pages/auth/LoginPage.dart';
@@ -28,9 +29,6 @@ class _HomepageState extends State<Homepage> {
       _selectedIndex = index;
     });
   }
-
-
-
 
   List<Widget> _pages = [];
 
@@ -131,7 +129,8 @@ class _HomepageState extends State<Homepage> {
                       size: 30,
                     ),
                     onPressed: () async {
-                      await AuthService.logout().then((val) {
+                      await AuthService.logout(AppStateManager.currentUser!)
+                          .then((val) {
                         Navigation.pushReplacement(context, LoginPage());
                       });
                     },

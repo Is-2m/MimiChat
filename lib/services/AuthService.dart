@@ -1,4 +1,5 @@
 import 'package:mimichat/dao/AuthDAO.dart';
+import 'package:mimichat/dao/MessageWebSocket.dart';
 import 'package:mimichat/models/User.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 
@@ -12,7 +13,7 @@ class AuthService {
       });
       return user;
     } catch (e) {
-      print("[AuthService.login()] An Exception Occurred:\n ${e}");
+      print("[AuthService.login().catch] An Exception Occurred:\n ${e}");
       return null;
     }
   }
@@ -28,7 +29,8 @@ class AuthService {
     return user;
   }
 
-  static Future<void> logout() async {
+  static Future<void> logout(User user) async {
+    await AuthDAO.logout(user);
     await AppStateManager.clearCache();
   }
 }

@@ -21,9 +21,9 @@ class Chat {
         id: "${json['id']}",
         sender: User.fromJson(json['sender']),
         receiver: User.fromJson(json['receiver']),
-        messages: json['messageLogList'] == null
+        messages: json['messageList'] == null
             ? []
-            : (json['messageLogList'] as List)
+            : (json['messageList'] as List)
                 .map((msg) => Message.fromJson(msg as Map<String, dynamic>))
                 .toList());
   }
@@ -33,7 +33,7 @@ class Chat {
       'id': id,
       'sender': sender.toJson(),
       'receiver': receiver.toJson(),
-      'messageLogList': messages.map((message) => message.toJson()).toList(),
+      'messageList': messages.map((message) => message.toJson()).toList(),
     };
   }
 }

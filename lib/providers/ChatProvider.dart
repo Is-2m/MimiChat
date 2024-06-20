@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mimichat/models/Chat.dart';
+import 'package:mimichat/models/Message.dart';
 
 class ChatProvider with ChangeNotifier {
   Chat? _selectedChat;
@@ -22,5 +23,9 @@ class ChatProvider with ChangeNotifier {
     return;
   }
 
-  
+  void addMessage(Message msg) {
+    _selectedChat!.messages.add(msg);
+    notifyListeners();
+    return;
+  }
 }

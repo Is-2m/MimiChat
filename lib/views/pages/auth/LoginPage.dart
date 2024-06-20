@@ -51,6 +51,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -93,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 5,
                 ),
                 Text(
-                  "Sign in to continue to MimiChat.",
+                  "Sign in to continue to MimiChat. ${size.width}",
                   style: TextStyle(color: Color(0xFF8B8FA7)),
                 ),
                 Container(
@@ -103,7 +104,12 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(10),
                     child: Container(
                       padding: EdgeInsets.all(20),
-                      width: MediaQuery.of(context).size.width * 0.4,
+                      width: size.width *
+                          (size.width > 1000
+                              ? 0.4
+                              : size.width > 800
+                                  ? 0.6
+                                  : 0.85),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,

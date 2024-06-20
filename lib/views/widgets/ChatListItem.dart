@@ -55,7 +55,7 @@ class _ChatListItemState extends State<ChatListItem> {
           subtitle: Container(
               padding: EdgeInsets.only(bottom: 5),
               child: Text(
-                  '${currentUser.id == lastMsg.idSender ? 'You: ' : ''}${lastMsg.content}')),
+                  '${currentUser.isSamePersonAs(lastMsg.sender) ? 'You: ' : ''}${lastMsg.content}')),
           // contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           leading: Container(
             child: Transform.scale(

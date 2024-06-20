@@ -1,3 +1,5 @@
+import 'package:mimichat/models/Status.dart';
+
 class User {
   String id;
   String? firstName;
@@ -9,6 +11,7 @@ class User {
   String? bio;
   String? birthDate;
   String? profilePicture = "";
+  Status? status;
 
   User({
     this.id = "",
@@ -21,6 +24,7 @@ class User {
     this.bio = "",
     this.birthDate = "",
     this.profilePicture = "",
+    this.status,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -35,6 +39,11 @@ class User {
       username: "${json['username']}",
       birthDate: "${json['birthDate'] ?? null}",
       profilePicture: "${json['profilePicture'] ?? null}",
+      status: json['status'] == null
+          ? null
+          : json['status'] == Status.OFFLINE.name
+              ? Status.OFFLINE
+              : Status.ONLINE,
     );
   }
 
@@ -50,6 +59,7 @@ class User {
       'username': username,
       'birthDate': birthDate,
       'profilePicture': profilePicture,
+      'status': status?.name,
     };
   }
 

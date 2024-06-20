@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:mimichat/dao/MessageWebSocket.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/User.dart';
 import 'package:mimichat/services/ChatService.dart';
@@ -92,9 +91,13 @@ class _ChatListPageState extends State<ChatListPage> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       List<Chat> chats = snapshot.data!;
+                      // inspect(chats);
                       return ListView.builder(
                         itemCount: chats.length,
                         itemBuilder: (context, index) {
+                          MessageWebSocket msw = MessageWebSocket();
+                          // msw.subscribeToPrivateChat(chats[index].id);
+
                           return ChatListItem(
                             chat: chats[index],
                           );

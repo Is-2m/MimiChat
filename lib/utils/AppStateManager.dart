@@ -1,44 +1,31 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
+import 'package:mimichat/dao/MessageWebSocket.dart';
 import 'package:mimichat/models/User.dart';
-import 'package:mimichat/services/ImageService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStateManager {
-  static final String apiURL = "http://localhost:8080/api";
+  // static int id = 130271211;
+  // static String signIn =
+  //     "a91961d9a72a5a8fe6aa2f70387b995ed7fbce67e4667e009206e515c89b52fa";
+
+  static int VVCall_ID = 1137855613;
+  static String VVCall_signIn = "715fd0ae2eda4f27f17d2dd5b32514ba58d3bfdf634794d841645b03e5f79026";
+
+  static final String apiURL = "http://192.168.1.13:8080/api";
 
   static SharedPreferences? _cache;
   static final String _currentUser_CacheName = "currentUser";
   static final String _CACHE_NAME = "app_state_cache";
 
   static User? currentUser;
-  static Widget? currentPdp;
 
   static saveCurrentUser(User? user) {
     if (user != null) {
+      final ws = MessageWebSocket();
+      // ws.connect(user!.id);
       currentUser = user;
       _cache!.setString(_currentUser_CacheName, jsonEncode(user.toJson()));
-      currentPdp = FutureBuilder<Uint8List?>(
-          future: ImageService.getImage(currentUser!.profilePicture!),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return CircleAvatar(
-                child: Icon(Icons.error),
-              );
-            } else if (snapshot.hasData) {
-              return CircleAvatar(
-                backgroundImage: MemoryImage(snapshot.data!),
-              );
-            } else {
-              return CircleAvatar(
-                child: Icon(Icons.person),
-              );
-            }
-          });
     } else {
       currentUser = null;
       _cache!.setString(_currentUser_CacheName, "null");

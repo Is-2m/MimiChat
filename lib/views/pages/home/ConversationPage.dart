@@ -1,7 +1,7 @@
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:mimichat/dao/MessageDAO.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/Message.dart';
 import 'package:mimichat/models/User.dart';
@@ -14,6 +14,7 @@ import 'package:mimichat/views/widgets/chat_bubble/LeftChatBubble.dart';
 import 'package:mimichat/views/widgets/chat_bubble/RightChatBubble.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 class ConversationPage extends StatefulWidget {
   ConversationPage();
@@ -31,6 +32,22 @@ class _ConversationPageState extends State<ConversationPage> {
     });
   }
 
+  Future<Message?> sendMessage(
+      String msg, User sender, User receiver, String chatId) async {
+    Message? result;
+    if (msg.isNotEmpty) {
+      Message msg = Message(
+          content: _messageController.text,
+          date: DateTime.now(),
+          sender: sender,
+          receiver: receiver);
+      await MessageDAO.saveMessage(chatId, msg).then((val) {
+        result = val;
+      });
+    }
+    return result;
+  }
+
   @override
   void dispose() {
     _messageController.dispose();
@@ -43,27 +60,9 @@ class _ConversationPageState extends State<ConversationPage> {
     User currentUser = AppStateManager.currentUser!;
     Chat chat = chatProvider.selectedChat;
     bool isSender = currentUser.isSamePersonAs(chat.sender);
-    var img = FutureBuilder<Uint8List?>(
-        future: ImageService.getImage(isSender
-            ? chat.receiver.profilePicture!
-            : chat.sender.profilePicture!),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return CircleAvatar(
-              child: Icon(Icons.error),
-            );
-          } else if (snapshot.hasData) {
-            return CircleAvatar(
-              backgroundImage: MemoryImage(snapshot.data!),
-            );
-          } else {
-            return CircleAvatar(
-              child: Icon(Icons.person),
-            );
-          }
-        });
+
+    User otherUser =
+        chat.sender.id == currentUser.id ? chat.receiver : chat.sender;
     return LayoutBuilder(builder: (context, constraints) {
       double parentWidth = constraints.maxWidth;
 
@@ -94,9 +93,8 @@ class _ConversationPageState extends State<ConversationPage> {
                     child: Row(
                       children: [
                         FutureBuilder<Uint8List?>(
-                            future: ImageService.getImage(isSender
-                                ? chat.receiver.profilePicture!
-                                : chat.sender.profilePicture!),
+                            future: ImageService.getImage(
+                                otherUser.profilePicture!),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -120,13 +118,14 @@ class _ConversationPageState extends State<ConversationPage> {
                           width: 10,
                         ),
                         Text(
-                          '${isSender ? chat.receiver.fullName : chat.sender.fullName}',
+                          '${otherUser.fullName}',
                           style: TextStyle(
                               fontSize: 17,
                               fontFamily: "PublicSans",
                               fontWeight: FontWeight.w600),
                         ),
                         Spacer(),
+                        
                         Container(
                             padding: EdgeInsets.symmetric(horizontal: 10),
                             child: IconButton(
@@ -183,25 +182,23 @@ class _ConversationPageState extends State<ConversationPage> {
                   Flexible(
                     child: ListView.builder(
                       reverse: true,
-                      itemCount: chat.messages.length,
+                      itemCount: chatProvider.selectedChat.messages.length,
                       itemBuilder: (context, index) {
                         int reversedIndex = chat.messages.length - index - 1;
                         Message msg = chat.messages[reversedIndex];
-
-                        return msg.idSender != currentUser.id
-                            ? LeftChatBubble(
-                                img: "${chat.sender.profilePicture}",
+                        bool amISender = msg.sender.isSamePersonAs(currentUser);
+                        return amISender
+                            ? RightChatBubble(
+                                img: "${msg.sender.profilePicture}",
                                 message: "${msg.content}",
                                 time: "${timeago.format(msg.date)}",
                                 isExpanded: _isExpanded,
-                                imgWidget: img,
                               )
-                            : RightChatBubble(
-                                img: "${chat.receiver.profilePicture}",
+                            : LeftChatBubble(
+                                img: "${msg.sender.profilePicture}",
                                 message: "${msg.content}",
                                 time: "${timeago.format(msg.date)}",
                                 isExpanded: _isExpanded,
-                                imgWidget: AppStateManager.currentPdp,
                               );
                       },
                     ),
@@ -227,7 +224,8 @@ class _ConversationPageState extends State<ConversationPage> {
                           child: TextField(
                             controller: _messageController,
                             onSubmitted: (val) {
-                              print("_messageController onSubmitted(), $val");
+                              sendMessage(_messageController.text, currentUser,
+                                  otherUser, chat.id);
                             },
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
@@ -262,7 +260,18 @@ class _ConversationPageState extends State<ConversationPage> {
                           ),
                           child: IconButton(
                               color: Colors.white,
-                              onPressed: () {},
+                              onPressed: () {
+                                sendMessage(_messageController.text,
+                                        currentUser, otherUser, chat.id)
+                                    .then((val) {
+                                  if (val != null) {
+                                    chatProvider.addMessage(val);
+                                    setState(() {
+                                      _messageController.clear();
+                                    });
+                                  }
+                                });
+                              },
                               icon: Icon(Icons.send)),
                         )
                       ],

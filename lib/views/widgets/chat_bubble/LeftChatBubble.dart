@@ -10,14 +10,12 @@ class LeftChatBubble extends StatefulWidget {
   final String message;
   final String time;
   final bool isExpanded;
-  Widget? imgWidget;
-  
+
   LeftChatBubble({
     required this.img,
     required this.message,
     required this.time,
     required this.isExpanded,
-    this.imgWidget,
   });
 
   @override
@@ -46,9 +44,7 @@ class _LeftChatBubbleState extends State<LeftChatBubble> {
         children: [
           Container(
             padding: EdgeInsets.only(top: 50),
-            child: widget.imgWidget != null
-                ? widget.imgWidget
-                : FutureBuilder<Uint8List?>(
+            child: FutureBuilder<Uint8List?>(
                     future: ImageService.getImage(widget.img),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {

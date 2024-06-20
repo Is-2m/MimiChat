@@ -19,8 +19,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     var user = AppStateManager.currentUser;
-    print("object ${user == null}");
-    print("AppStateManager.currentPdp: ${AppStateManager.currentPdp == null}");
 
     String name = "${user!.firstName ?? "-"} ${user.lastName ?? "-"}";
     String dateOfBirth = "";
@@ -75,18 +73,35 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Stack(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
-                          child: Material(
-                            elevation: 2,
-                            child: Container(
-                              padding: EdgeInsets.all(2),
-                              child: Transform.scale(
-                                scale: 2,
-                                child: AppStateManager.currentPdp!,
-                              ),
-                            ),
-                          ),
+                        FutureBuilder<Uint8List?>(
+                          future: ImageService.getImage(user.profilePicture!),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else if (snapshot.hasData) {
+                              return ClipRRect(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(50)),
+                                child: Material(
+                                  elevation: 2,
+                                  child: Container(
+                                    padding: EdgeInsets.all(2),
+                                    child: CircleAvatar(
+                                      radius: 50,
+                                      backgroundImage:
+                                          MemoryImage(snapshot.data!),
+                                    ),
+                                  ),
+                                ),
+                              );
+                              // return Image.memory(snapshot.data!);
+                            } else {
+                              return Text('No image found.');
+                            }
+                          },
                         ),
                         Positioned(
                             bottom: 0,

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:mimichat/models/User.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
@@ -21,6 +20,9 @@ class AuthDAO {
         },
       );
 
+      print("Hello");
+      print("response: ${response.body}");
+      print(response);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         return User.fromJson(data);
@@ -28,7 +30,7 @@ class AuthDAO {
         return null;
       }
     } catch (e) {
-      print("[AuthDAO.login()] An Exception Occurred:\n ${e}");
+      print("[AuthDAO.login().catch] An Exception Occurred:\n ${e}");
       return null;
     }
   }
@@ -50,11 +52,35 @@ class AuthDAO {
         var data = json.decode(response.body);
         return User.fromJson(data);
       } else {
+        print("[AuthDAO.register().else] An Error Occurred: ${response.body}");
         return null;
       }
     } catch (e) {
-      print("[AuthDAO.register()] An Exception Occurred:\n ${e}");
+      print("[AuthDAO.register().catch] An Exception Occurred:\n ${e}");
       return null;
+    }
+  }
+
+  static Future<void> logout(User user) async {
+    var body = jsonEncode(user.toJson());
+    print(body);
+    try {
+      var response = await http.post(
+        Uri.parse("$_apiUrl/logout"),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: body,
+      );
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        print("[AuthDAO.logout().else] An Error Occurred: ${response.body}");
+        return;
+      }
+    } catch (e) {
+      print("[AuthDAO.logout().catch] An Exception Occurred:\n ${e}");
+      return;
     }
   }
 }

@@ -1,21 +1,20 @@
-import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/User.dart';
 
 class Message {
-  String id;
+  String? id;
   // String idChat;
   String content;
-  String idSender;
-  String idReceiver;
+  User sender;
+  User receiver;
   DateTime date;
 
   Message({
-    required this.id,
+    this.id,
     // required this.idChat,
     required this.content,
     required this.date,
-    required this.idSender,
-    required this.idReceiver,
+    required this.sender,
+    required this.receiver,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -23,9 +22,10 @@ class Message {
       id: "${json['id']}",
       // idChat: "${json}",
       content: json['content'],
-      date: DateTime.parse("${json['date']}"),
-      idSender: "${json['id_sender']}",
-      idReceiver: "${json['id_receiver']}",
+      date: DateTime.fromMillisecondsSinceEpoch(int.parse("${json['date']}"),
+          isUtc: true),
+      sender: User.fromJson(json['sender']),
+      receiver: User.fromJson(json['receiver']),
     );
   }
 
@@ -35,8 +35,8 @@ class Message {
       // 'chat': chat.toJson(),
       'content': content,
       'date': date.toUtc().millisecondsSinceEpoch,
-      'id_sender': idSender,
-      'id_receiver': idReceiver,
+      'sender': sender,
+      'receiver': receiver,
     };
   }
 
