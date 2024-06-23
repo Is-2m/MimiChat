@@ -10,7 +10,6 @@ class ChatDao {
   static Future<List<Chat>> getChats({required String userId}) async {
     var localApi = "$_apiUrl/$userId/all";
     List<Chat> chats = [];
-    print("Url : $localApi");
     try {
       final response = await http.get(Uri.parse(localApi));
       if (response.statusCode == 200) {

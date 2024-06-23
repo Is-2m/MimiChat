@@ -43,13 +43,13 @@ dependencies:
   http:
   file_picker:
   timeago:
-  # zego_zim:
-  # zego_zimkit:
+
   stomp_dart_client:
-  web_socket_channel:
-  zego_express_engine:
+  # web_socket_channel:
+
+  # zego_express_engine:
   # zego_uikit: ^2.22.8
-  # zego_uikit_prebuilt_call: ^4.11.6
+  # zego_uikit_prebuilt_call:
   # zego_uikit_signaling_plugin: ^2.7.12
 
   uuid:

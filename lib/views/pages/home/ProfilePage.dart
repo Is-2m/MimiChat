@@ -61,7 +61,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ],
                     onSelected: (value) {
-                      print(value);
+                      // print(value);
                     },
                   )
                 ],

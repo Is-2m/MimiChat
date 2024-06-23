@@ -21,7 +21,7 @@ class _WrapperState extends State<Wrapper> {
 
     AppStateManager.getCurrentUser().then((value) {
       setState(() {
-        print("CurrentUSer $value");
+        // print("CurrentUSer $value");
         user = value;
         _isLoading = false;
       });

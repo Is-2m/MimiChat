@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:mimichat/dao/MessageWebSocket.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/User.dart';
+import 'package:mimichat/providers/ChatProvider.dart';
 import 'package:mimichat/services/ChatService.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/views/widgets/ChatListItem.dart';
+import 'package:provider/provider.dart';
 
 class ChatListPage extends StatefulWidget {
   ChatListPage();
@@ -48,7 +50,7 @@ class _ChatListPageState extends State<ChatListPage> {
               child: TextField(
                 controller: _searchController,
                 onSubmitted: (val) {
-                  print("Salamo 3alaykom, $val");
+                  // print("Salamo 3alaykom, $val");
                 },
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
@@ -85,31 +87,18 @@ class _ChatListPageState extends State<ChatListPage> {
                     ),
                   ),
                 )),
-            Expanded(
-              child: FutureBuilder<List<Chat>>(
-                  future: ChatService.getChats(currentUser.id),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      List<Chat> chats = snapshot.data!;
-                      // inspect(chats);
-                      return ListView.builder(
-                        itemCount: chats.length,
-                        itemBuilder: (context, index) {
-                          MessageWebSocket msw = MessageWebSocket();
-                          // msw.subscribeToPrivateChat(chats[index].id);
-
-                          return ChatListItem(
-                            chat: chats[index],
-                          );
-                        },
-                      );
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  }),
-            ),
+            Expanded(child:
+                Consumer<ChatProvider>(builder: (context, chatProvider, _) {
+              return ListView.builder(
+                itemCount: chatProvider.lstChats.length,
+                itemBuilder: (context, index) {
+                  Chat chat = chatProvider.lstChats[index];
+                  return ChatListItem(
+                    chat: chat,
+                  );
+                },
+              );
+            })),
           ],
         ));
   }

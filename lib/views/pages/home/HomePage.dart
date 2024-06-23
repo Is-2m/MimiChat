@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/providers/ChatProvider.dart';
 import 'package:mimichat/services/AuthService.dart';
+import 'package:mimichat/services/ChatService.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/utils/Navigation.dart';
@@ -12,7 +13,6 @@ import 'package:mimichat/views/pages/home/ContactsPage.dart';
 import 'package:mimichat/views/pages/home/ConversationPage.dart';
 import 'package:mimichat/views/pages/home/ProfilePage.dart';
 import 'package:provider/provider.dart';
-import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 class Homepage extends StatefulWidget {
   int? selectedIndex = 0;
@@ -25,6 +25,8 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   int _selectedIndex = 0;
   Chat? currentChat;
+  late ChatProvider chatProvider;
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -37,21 +39,17 @@ class _HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
     _selectedIndex = widget.selectedIndex ?? 0;
+    chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    ChatService.getChats(userId: AppStateManager.currentUser!.id, ctx: context);
     _pages = [
       ChatListPage(),
       Contactspage(),
       ProfilePage(),
     ];
-
-    AuthService.onUserLogin();
-  }
-  void a (){
-  
   }
 
   @override
   Widget build(BuildContext context) {
-    ChatProvider chatProvider = Provider.of<ChatProvider>(context);
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Row(
@@ -71,11 +69,6 @@ class _HomepageState extends State<Homepage> {
                       colorFilter: ColorFilter.mode(
                           CustomColors.purpple, BlendMode.srcIn),
                       semanticsLabel: 'MimiChat Logo'),
-                  // Icon(
-                  //   Icons.chat_bubble_rounded,
-                  //   size: 30,
-                  //   color: CustomColors.purpple,
-                  // ),
                 ),
                 SizedBox(height: 20),
                 Container(
@@ -146,40 +139,15 @@ class _HomepageState extends State<Homepage> {
               ],
             ),
           ),
-          // Main Content Area
-
           _buildSelectedPage(
               width, chatProvider.selectedChat, _pages[_selectedIndex]),
-          // Expanded(
-          //   flex: 2,
-          //   child: _pages[_selectedIndex],
-          // ),
           _buildConversationPAge(width, chatProvider.selectedChat),
-          // Expanded(
-          //   flex: 5,
-          //   child: chatProvider.showChat
-          //       ? ConversationPage()
-          //       : Container(
-          //           color:
-          //               Color(0xFFF7F7FF), // Placeholder for additional content
-          //           child: Center(
-          //               child: SvgPicture.asset(
-          //             'images/logo.svg',
-          //             width: 100,
-          //             height: 100,
-          //             colorFilter: ColorFilter.mode(
-          //                 CustomColors.purpple.withOpacity(0.5),
-          //                 BlendMode.srcIn),
-          //           )),
-          //         ),
-          // ),
         ],
       ),
     );
   }
 
   Widget _buildSelectedPage(double width, Chat? chat, Widget org) {
-    print("_buildSelectedPage is called width: $width, chat: ${chat == null}");
     Widget wid = Container();
     var res = -1;
 
@@ -205,13 +173,10 @@ class _HomepageState extends State<Homepage> {
         res = 3;
       }
     }
-    print("result: $res");
     return wid;
   }
 
   Widget _buildConversationPAge(double width, Chat? chat) {
-    print(
-        "_buildConversationPAge is called width: $width, chat: ${chat == null}");
     Widget wid = Container();
     var res = -1;
     if (chat == null) {
@@ -244,7 +209,6 @@ class _HomepageState extends State<Homepage> {
         res = 3;
       }
     }
-    print("Result $res  ");
     return wid;
   }
 }

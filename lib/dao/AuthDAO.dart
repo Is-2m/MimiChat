@@ -20,8 +20,6 @@ class AuthDAO {
         },
       );
 
-      print("Hello");
-      print("response: ${response.body}");
       print(response);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mimichat/providers/ChatProvider.dart';
+import 'package:mimichat/sockets/WsStompConfig.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/views/pages/auth/LoginPage.dart';
@@ -7,34 +8,22 @@ import 'package:mimichat/views/pages/auth/Wrapper.dart';
 import 'package:mimichat/views/pages/home/HomePage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
-import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  WsStompConfig.stompClient.activate();
 
   await SharedPreferences.getInstance().then((cache) {
     AppStateManager.setCache(cache);
-    final navigatorKey = GlobalKey<NavigatorState>();
 
-  ZegoUIKit().initLog().then((value) {
-    ZegoUIKitPrebuiltCallInvitationService().useSystemCallingUI(
-      [ZegoUIKitSignalingPlugin()],
-    );
-
-      runApp(
+    runApp(
       ChangeNotifierProvider(
         create: (context) => ChatProvider(),
-        child: MyApp(
-          key: navigatorKey,
-        ),
+        child: MyApp(),
       ),
     );
-  });
-
-
- 
   });
 }
 
@@ -49,6 +38,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ChatProvider()),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         title: 'MimiChat',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -63,19 +53,6 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        builder: (BuildContext context, Widget? child) {
-          return Stack(
-            children: [
-              child!,
-
-              ZegoUIKitPrebuiltCallMiniOverlayPage(
-                contextQuery: () {
-                  return navigatorKey.currentState!.context;
-                },
-              ),
-            ],
-          );
-        },
         home: Wrapper(),
       ),
     );

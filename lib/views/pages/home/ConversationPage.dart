@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -7,17 +8,14 @@ import 'package:mimichat/models/Message.dart';
 import 'package:mimichat/models/User.dart';
 import 'package:mimichat/providers/ChatProvider.dart';
 import 'package:mimichat/services/ImageService.dart';
+import 'package:mimichat/sockets/WsStompMessages.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/utils/CustomColors.dart';
-import 'package:mimichat/utils/Navigation.dart';
-import 'package:mimichat/views/pages/call/CallPage.dart';
 import 'package:mimichat/views/pages/home/PersonProfile.dart';
 import 'package:mimichat/views/widgets/chat_bubble/LeftChatBubble.dart';
 import 'package:mimichat/views/widgets/chat_bubble/RightChatBubble.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:uuid/uuid.dart';
-import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 class ConversationPage extends StatefulWidget {
   ConversationPage();
@@ -39,14 +37,18 @@ class _ConversationPageState extends State<ConversationPage> {
       String msg, User sender, User receiver, String chatId) async {
     Message? result;
     if (msg.isNotEmpty) {
-      Message msg = Message(
-          content: _messageController.text,
-          date: DateTime.now(),
-          sender: sender,
-          receiver: receiver);
-      await MessageDAO.saveMessage(chatId, msg).then((val) {
-        result = val;
-      });
+      Map<String, dynamic> body = {
+        "chat": {"id": chatId},
+        "sender": sender,
+        "receiver": receiver,
+        "content": _messageController.text,
+        "date": "${DateTime.now().toUtc().millisecondsSinceEpoch}",
+      };
+      WsStompMessage.send(chatId: chatId, body: body);
+      _messageController.clear();
+      // await MessageDAO.saveMessage(chatId, msg).then((val) {
+      //   result = val;
+      // });
     }
     return result;
   }
@@ -104,8 +106,6 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   Widget _buildMainWidget(double width, bool _isExpnded, Widget org) {
-    print(
-        "_buildMainWidget is called width: $width, isExpanded: ${_isExpanded}");
     Widget wid = Expanded(child: org);
 
     var res = -1;
@@ -124,7 +124,6 @@ class _ConversationPageState extends State<ConversationPage> {
       }
     }
 
-    print("result: $res");
     return wid;
   }
 
@@ -132,7 +131,6 @@ class _ConversationPageState extends State<ConversationPage> {
     double width,
     bool _isExpnded,
   ) {
-    print("_buildProfileWidget is called width: $width, chat: ${_isExpnded}");
     Widget wid = SizedBox.shrink();
     var res = -1;
     if (_isExpnded) {
@@ -155,7 +153,6 @@ class _ConversationPageState extends State<ConversationPage> {
         res = 3;
       }
     }
-    print("Result $res  ");
     return wid;
   }
 }
@@ -226,53 +223,33 @@ Widget _mainWidget(
                     fontFamily: "PublicSans",
                     fontWeight: FontWeight.w600),
               ),
-              width > 600 ? Spacer() : SizedBox.shrink(),
+              width > 600
+                  ? SizedBox(
+                      width: width * 0.5,
+                    )
+                  : SizedBox.shrink(),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: sendCallButton(
-                    isVideoCall: false,
-                    recieverID: otherUser.id,
-                    recieverUsername: otherUser.username,
-                    onCallFinished: onSendCallInvitationFinished),
-                // IconButton(
-                //   tooltip: "Voice Call",
-                //   onPressed: () {
-                //     var uuid = Uuid();
-
-                //     Navigation.push(context,
-                //         CallPage(isVideoCall: false, callID: uuid.v4()));
-                //   },
-                //   icon: Icon(
-                //     Icons.phone_outlined,
-                //     size: 25,
-                //     color: Colors.grey[500],
-                //   ),
-                // )
-              ),
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: IconButton(
+                    tooltip: "Voice Call",
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.phone_outlined,
+                      size: 25,
+                      color: Colors.grey[500],
+                    ),
+                  )),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: sendCallButton(
-                    isVideoCall: true,
-                    recieverID: otherUser.id,
-                    recieverUsername: otherUser.username,
-                    onCallFinished: onSendCallInvitationFinished),
-              ),
-              // Container(
-              //     padding: EdgeInsets.symmetric(horizontal: 10),
-              //     child: IconButton(
-              //       tooltip: "Video Call",
-              //       onPressed: () {
-              //         var uuid = Uuid();
-
-              //         Navigation.push(context,
-              //             CallPage(isVideoCall: true, callID: uuid.v4()));
-              //       },
-              //       icon: Icon(
-              //         Icons.videocam_outlined,
-              //         size: 25,
-              //         color: Colors.grey[500],
-              //       ),
-              //     )),
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: IconButton(
+                    tooltip: "Video Call",
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.videocam_outlined,
+                      size: 25,
+                      color: Colors.grey[500],
+                    ),
+                  )),
               Container(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: IconButton(
@@ -317,26 +294,30 @@ Widget _mainWidget(
         ),
       ),
       Flexible(
-        child: ListView.builder(
-          reverse: true,
-          itemCount: chatProvider.selectedChat!.messages.length,
-          itemBuilder: (context, index) {
-            int reversedIndex = chat.messages.length - index - 1;
-            Message msg = chat.messages[reversedIndex];
-            bool amISender = msg.sender.isSamePersonAs(currentUser);
-            return amISender
-                ? RightChatBubble(
-                    img: "${msg.sender.profilePicture}",
-                    message: "${msg.content}",
-                    time: "${timeago.format(msg.date)}",
-                    isExpanded: _isExpanded,
-                  )
-                : LeftChatBubble(
-                    img: "${msg.sender.profilePicture}",
-                    message: "${msg.content}",
-                    time: "${timeago.format(msg.date)}",
-                    isExpanded: _isExpanded,
-                  );
+        child: Consumer<ChatProvider>(
+          builder: (context, chatProvider, _) {
+            return ListView.builder(
+              reverse: true,
+              itemCount: chatProvider.selectedChat!.messages.length,
+              itemBuilder: (context, index) {
+                int reversedIndex = chat.messages.length - index - 1;
+                Message msg = chat.messages[reversedIndex];
+                bool amISender = msg.sender.isSamePersonAs(currentUser);
+                return amISender
+                    ? RightChatBubble(
+                        img: "${msg.sender.profilePicture}",
+                        message: "${msg.content}",
+                        time: "${timeago.format(msg.date)}",
+                        isExpanded: _isExpanded,
+                      )
+                    : LeftChatBubble(
+                        img: "${msg.sender.profilePicture}",
+                        message: "${msg.content}",
+                        time: "${timeago.format(msg.date)}",
+                        isExpanded: _isExpanded,
+                      );
+              },
+            );
           },
         ),
       ),
@@ -408,69 +389,4 @@ Widget _mainWidget(
       )
     ],
   );
-}
-
-Widget sendCallButton({
-  required bool isVideoCall,
-  required String recieverID,
-  required String recieverUsername,
-  void Function(String code, String message, List<String>)? onCallFinished,
-}) {
-  final invitees = [
-    ZegoUIKitUser(
-      id: recieverID,
-      name: recieverID,
-    )
-  ];
-
-  return ZegoSendCallInvitationButton(
-    isVideoCall: isVideoCall,
-    invitees: invitees,
-    resourceID: 'zego_data',
-    iconSize: const Size(40, 40),
-    buttonSize: const Size(50, 50),
-    clickableBackgroundColor: Colors.transparent,
-    clickableTextColor: Colors.grey[500],
-    onPressed: onCallFinished,
-  );
-}
-
-void onSendCallInvitationFinished(
-  String code,
-  String message,
-  List<String> errorInvitees,
-  // BuildContext ctx,
-) {
-  if (errorInvitees.isNotEmpty) {
-    var userIDs = '';
-    for (var index = 0; index < errorInvitees.length; index++) {
-      if (index >= 5) {
-        userIDs += '... ';
-        break;
-      }
-
-      final userID = errorInvitees.elementAt(index);
-      userIDs += '$userID ';
-    }
-    if (userIDs.isNotEmpty) {
-      userIDs = userIDs.substring(0, userIDs.length - 1);
-    }
-
-    var message = "User doesn't exist or is offline: $userIDs";
-    if (code.isNotEmpty) {
-      message += ', code: $code, message:$message';
-    }
-
-    print("$message");
-    // ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-    //   content: Text("$message"),
-    //   backgroundColor: Colors.redAccent,
-    // ));
-  } else if (code.isNotEmpty) {
-    print("code: $code, message:$message");
-    // ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-    //   content: Text('code: $code, message:$message'),
-    //   backgroundColor: Colors.redAccent,
-    // ));
-  }
 }

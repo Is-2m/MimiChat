@@ -139,7 +139,7 @@ class _AddInfoPopupState extends State<AddInfoPopup> {
               await UserService.updateUserInfo(user!).then((val) {
                 if (val) {
                   setState(() {
-                    print("state was set");
+                    // print("state was set");
                     Navigator.of(context).pop();
                   });
                 } else {
