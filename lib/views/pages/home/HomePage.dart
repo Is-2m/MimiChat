@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:mimichat/models/Chat.dart';
-import 'package:mimichat/providers/ChatProvider.dart';
+import 'package:mimichat/providers/ChatsProvider.dart';
+import 'package:mimichat/providers/SelectedChatProvider.dart';
 import 'package:mimichat/services/AuthService.dart';
 import 'package:mimichat/services/ChatService.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
@@ -25,7 +26,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   int _selectedIndex = 0;
   Chat? currentChat;
-  late ChatProvider chatProvider;
+  late SelectedChatProvider selectedChatProvider;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -39,13 +40,19 @@ class _HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
     _selectedIndex = widget.selectedIndex ?? 0;
-    chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    ChatService.getChats(userId: AppStateManager.currentUser!.id, ctx: context);
     _pages = [
       ChatListPage(),
       Contactspage(),
       ProfilePage(),
     ];
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    selectedChatProvider =
+        Provider.of<SelectedChatProvider>(context, listen: false);
+    ChatService.getChats(userId: AppStateManager.currentUser!.id, ctx: context);
   }
 
   @override
@@ -139,19 +146,28 @@ class _HomepageState extends State<Homepage> {
               ],
             ),
           ),
-          _buildSelectedPage(
-              width, chatProvider.selectedChat, _pages[_selectedIndex]),
-          _buildConversationPAge(width, chatProvider.selectedChat),
+          Consumer<SelectedChatProvider>(
+            builder: (context, selectedChatProvider, child) {
+              return _buildSelectedPage(width,
+                  selectedChatProvider.selectedChat, _pages[_selectedIndex]);
+            },
+          ),
+          Consumer<SelectedChatProvider>(
+            builder: (context, selectedChatProvider, child) {
+              return _buildConversationPAge(
+                  width, selectedChatProvider.selectedChat);
+            },
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSelectedPage(double width, Chat? chat, Widget org) {
+  Widget _buildSelectedPage(double width, String? chatID, Widget org) {
     Widget wid = Container();
     var res = -1;
 
-    if (chat == null) {
+    if (chatID == null) {
       if (width > 700) {
         wid = Expanded(
           child: org,
@@ -176,10 +192,10 @@ class _HomepageState extends State<Homepage> {
     return wid;
   }
 
-  Widget _buildConversationPAge(double width, Chat? chat) {
+  Widget _buildConversationPAge(double width, String? chatID) {
     Widget wid = Container();
     var res = -1;
-    if (chat == null) {
+    if (chatID == null) {
       if (width > 700) {
         res = 1;
         wid = Expanded(

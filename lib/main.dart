@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mimichat/providers/ChatProvider.dart';
+import 'package:mimichat/providers/ChatsProvider.dart';
+import 'package:mimichat/providers/SelectedChatProvider.dart';
 import 'package:mimichat/sockets/WsStompConfig.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/utils/CustomColors.dart';
@@ -13,14 +14,23 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  WsStompConfig.stompClient.activate();
+  if (!WsStompConfig.stompClient.isActive) {
+    WsStompConfig.stompClient.activate();
+  }
 
   await SharedPreferences.getInstance().then((cache) {
     AppStateManager.setCache(cache);
 
     runApp(
-      ChangeNotifierProvider(
-        create: (context) => ChatProvider(),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => ChatsProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => SelectedChatProvider(),
+          )
+        ],
         child: MyApp(),
       ),
     );
@@ -35,7 +45,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => ChatProvider()),
+        ChangeNotifierProvider(create: (context) => ChatsProvider()),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,

@@ -6,7 +6,8 @@ import 'package:mimichat/dao/MessageDAO.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/Message.dart';
 import 'package:mimichat/models/User.dart';
-import 'package:mimichat/providers/ChatProvider.dart';
+import 'package:mimichat/providers/ChatsProvider.dart';
+import 'package:mimichat/providers/SelectedChatProvider.dart';
 import 'package:mimichat/services/ImageService.dart';
 import 'package:mimichat/sockets/WsStompMessages.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
@@ -46,11 +47,13 @@ class _ConversationPageState extends State<ConversationPage> {
       };
       WsStompMessage.send(chatId: chatId, body: body);
       _messageController.clear();
-      // await MessageDAO.saveMessage(chatId, msg).then((val) {
-      //   result = val;
-      // });
     }
     return result;
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -61,9 +64,12 @@ class _ConversationPageState extends State<ConversationPage> {
 
   @override
   Widget build(BuildContext context) {
-    ChatProvider chatProvider = Provider.of<ChatProvider>(context);
+    SelectedChatProvider selcChaProvider =
+        Provider.of<SelectedChatProvider>(context);
     User currentUser = AppStateManager.currentUser!;
-    Chat chat = chatProvider.selectedChat!;
+
+    Chat chat = Provider.of<ChatsProvider>(context, listen: false)
+        .getCurrentChat(selcChaProvider.selectedChat!);
 
     User otherUser =
         chat.sender.id == currentUser.id ? chat.receiver : chat.sender;
@@ -87,7 +93,7 @@ class _ConversationPageState extends State<ConversationPage> {
                 width,
                 _isExpanded,
                 _mainWidget(
-                    chatProvider,
+                    selcChaProvider,
                     currentUser,
                     chat,
                     otherUser,
@@ -158,7 +164,7 @@ class _ConversationPageState extends State<ConversationPage> {
 }
 
 Widget _mainWidget(
-  ChatProvider chatProvider,
+  SelectedChatProvider selChaProvider,
   User currentUser,
   Chat chat,
   User otherUser,
@@ -190,7 +196,7 @@ Widget _mainWidget(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: IconButton(
                       onPressed: () {
-                        chatProvider.closeChat();
+                        selChaProvider.closeChat();
                       },
                       icon: Icon(Icons.arrow_back_ios))),
               FutureBuilder<Uint8List?>(
@@ -270,7 +276,7 @@ Widget _mainWidget(
                   onSelected: (String choice) {
                     switch (choice) {
                       case 'Close Chat':
-                        chatProvider.closeChat();
+                        selChaProvider.closeChat();
                         break;
                       case 'Delete Chat':
                         break;
@@ -294,12 +300,17 @@ Widget _mainWidget(
         ),
       ),
       Flexible(
-        child: Consumer<ChatProvider>(
-          builder: (context, chatProvider, _) {
+        child: Consumer<ChatsProvider>(
+          builder: (context, chatsProv, _) {
             return ListView.builder(
               reverse: true,
-              itemCount: chatProvider.selectedChat!.messages.length,
+              itemCount: chatsProv
+                  .getCurrentChat(selChaProvider.selectedChat!)
+                  .messages
+                  .length,
               itemBuilder: (context, index) {
+                var chat =
+                    chatsProv.getCurrentChat(selChaProvider.selectedChat!);
                 int reversedIndex = chat.messages.length - index - 1;
                 Message msg = chat.messages[reversedIndex];
                 bool amISender = msg.sender.isSamePersonAs(currentUser);

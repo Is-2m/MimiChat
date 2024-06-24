@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/Message.dart';
 import 'package:mimichat/models/User.dart';
-import 'package:mimichat/providers/ChatProvider.dart';
+import 'package:mimichat/providers/ChatsProvider.dart';
+import 'package:mimichat/providers/SelectedChatProvider.dart';
 import 'package:mimichat/services/ImageService.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:provider/provider.dart';
@@ -22,11 +23,13 @@ class _ChatListItemState extends State<ChatListItem> {
   User currentUser = AppStateManager.currentUser!;
   @override
   Widget build(BuildContext context) {
+    print("ChatListItem.build");
     User sender = widget.chat.sender;
     User receiver = widget.chat.receiver;
     bool isSender = currentUser.isSamePersonAs(sender);
     Message lastMsg = widget.chat.messages.last;
-    ChatProvider chatProvider = Provider.of<ChatProvider>(context);
+    SelectedChatProvider selChaProvider =
+        Provider.of<SelectedChatProvider>(context, listen: false);
 
     return Material(
       type: MaterialType.transparency,
@@ -36,7 +39,7 @@ class _ChatListItemState extends State<ChatListItem> {
             side: BorderSide(color: Colors.transparent),
           ),
           onTap: () {
-            chatProvider.selectChat(widget.chat);
+            selChaProvider.selectChat(widget.chat.id);
           },
           hoverColor: Colors.grey[300],
           title: Row(

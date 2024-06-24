@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mimichat/dao/MessageWebSocket.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/User.dart';
-import 'package:mimichat/providers/ChatProvider.dart';
-import 'package:mimichat/services/ChatService.dart';
+import 'package:mimichat/providers/ChatsProvider.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/views/widgets/ChatListItem.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +25,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
   @override
   Widget build(BuildContext context) {
+    print("ChatListPage.build");
     return Container(
         color: Color(0xFFF5F7FB),
         padding: EdgeInsets.all(10),
@@ -88,7 +87,7 @@ class _ChatListPageState extends State<ChatListPage> {
                   ),
                 )),
             Expanded(child:
-                Consumer<ChatProvider>(builder: (context, chatProvider, _) {
+                Consumer<ChatsProvider>(builder: (context, chatProvider, _) {
               return ListView.builder(
                 itemCount: chatProvider.lstChats.length,
                 itemBuilder: (context, index) {
