@@ -42,28 +42,31 @@ class _LeftChatBubbleState extends State<LeftChatBubble> {
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
         children: [
-          Container(
-            padding: EdgeInsets.only(top: 50),
-            child: FutureBuilder<Uint8List?>(
-                future: ImageService.getImage(widget.img),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return CircleAvatar(
-                      child: Icon(Icons.error),
-                    );
-                  } else if (snapshot.hasData) {
-                    return CircleAvatar(
-                      backgroundImage: MemoryImage(snapshot.data!),
-                    );
-                  } else {
-                    return CircleAvatar(
-                      child: Icon(Icons.person),
-                    );
-                  }
-                }),
-          ),
+          MediaQuery.of(context).size.width < 500
+              ? SizedBox.shrink()
+              : Container(
+                  padding: EdgeInsets.only(top: 50),
+                  child: FutureBuilder<Uint8List?>(
+                      future: ImageService.getImage(widget.img),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return CircleAvatar(
+                            child: Icon(Icons.error),
+                          );
+                        } else if (snapshot.hasData) {
+                          return CircleAvatar(
+                            backgroundImage: MemoryImage(snapshot.data!),
+                          );
+                        } else {
+                          return CircleAvatar(
+                            child: Icon(Icons.person),
+                          );
+                        }
+                      }),
+                ),
           SizedBox(
             width: 15,
           ),

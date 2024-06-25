@@ -44,6 +44,7 @@ class _ConversationPageState extends State<ConversationPage> {
         "receiver": receiver,
         "content": _messageController.text,
         "date": "${DateTime.now().toUtc().millisecondsSinceEpoch}",
+        "seen": false
       };
       WsStompMessage.send(chatId: chatId, body: body);
       _messageController.clear();
@@ -318,13 +319,13 @@ Widget _mainWidget(
                     ? RightChatBubble(
                         img: "${msg.sender.profilePicture}",
                         message: "${msg.content}",
-                        time: "${timeago.format(msg.date)}",
+                        time: "${timeago.format(msg.date, locale: 'en_short')}",
                         isExpanded: _isExpanded,
                       )
                     : LeftChatBubble(
                         img: "${msg.sender.profilePicture}",
                         message: "${msg.content}",
-                        time: "${timeago.format(msg.date)}",
+                        time: "${timeago.format(msg.date, locale: 'en_short')}",
                         isExpanded: _isExpanded,
                       );
               },

@@ -51,7 +51,7 @@ class _ChatListItemState extends State<ChatListItem> {
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w500))),
               Spacer(),
-              Text('${timeago.format(lastMsg.date)}',
+              Text('${timeago.format(lastMsg.date, locale: 'en_short')}',
                   style: TextStyle(fontSize: 12)),
             ],
           ),

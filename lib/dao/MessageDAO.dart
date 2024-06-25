@@ -15,6 +15,7 @@ class MessageDAO {
       "receiver": msg.receiver,
       "content": msg.content,
       "date": "${msg.date.toUtc().millisecondsSinceEpoch}",
+      "seen": msg.seen
     };
     Message? msgReply;
     try {

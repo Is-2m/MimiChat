@@ -7,6 +7,7 @@ class Message {
   User sender;
   User receiver;
   DateTime date;
+  bool seen = true;
 
   Message({
     this.id,
@@ -15,6 +16,7 @@ class Message {
     required this.date,
     required this.sender,
     required this.receiver,
+    this.seen = true,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class Message {
           isUtc: true),
       sender: User.fromJson(json['sender']),
       receiver: User.fromJson(json['receiver']),
+      seen: json['seen'] ?? true,
     );
   }
 
@@ -37,13 +40,12 @@ class Message {
       'date': date.toUtc().millisecondsSinceEpoch,
       'sender': sender,
       'receiver': receiver,
+      'seen': seen,
     };
   }
+
   bool isSameMsgAs(Message msg) {
     return id == msg.id;
   }
 
-  // User get owner {
-  //   return idSender == chat.sender.id ? chat.sender : chat.receiver;
-  // }
 }
