@@ -7,7 +7,17 @@ class ChatsProvider extends ChangeNotifier {
 
   void addMessage(String chatId, Message msg) {
     final chat = lstChats.firstWhere((element) => element.id == chatId);
-    chat.messages.add(msg);
+
+    bool contains = false;
+    for (var i = chat.messages.length - 1; i >= 0; i--) {
+      if (chat.messages[i].isSameMsgAs(msg)) {
+        contains = true;
+        break;
+      }
+    }
+    if (!contains) {
+      chat.messages.add(msg);
+    }
     notifyListeners();
     return;
   }

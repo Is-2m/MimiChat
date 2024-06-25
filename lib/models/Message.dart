@@ -39,6 +39,9 @@ class Message {
       'receiver': receiver,
     };
   }
+  bool isSameMsgAs(Message msg) {
+    return id == msg.id;
+  }
 
   // User get owner {
   //   return idSender == chat.sender.id ? chat.sender : chat.receiver;

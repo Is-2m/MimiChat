@@ -36,4 +36,7 @@ class Chat {
       'messageList': messages.map((message) => message.toJson()).toList(),
     };
   }
+
+  
 }
+
