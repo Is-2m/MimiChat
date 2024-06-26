@@ -13,7 +13,8 @@ class AppStateManager {
   static String VVCall_signIn =
       "715fd0ae2eda4f27f17d2dd5b32514ba58d3bfdf634794d841645b03e5f79026";
 
-  static final String apiURL = "http://192.168.1.100:8080/api";
+  static final String apiURL = "https://192.168.1.100:8443/api";
+  static final String videoUrl = "https://192.168.1.100:8443/videocall.html";
 
   static SharedPreferences? _cache;
   static final String _currentUser_CacheName = "currentUser";

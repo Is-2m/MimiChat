@@ -48,6 +48,7 @@ class _ConversationPageState extends State<ConversationPage> {
       };
       WsStompMessage.send(chatId: chatId, body: body);
       _messageController.clear();
+      // print("Mesg sent");
     }
     return result;
   }

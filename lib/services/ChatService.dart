@@ -14,17 +14,17 @@ class ChatService {
       chats = val;
       ctx.read<ChatsProvider>().addChats(chats);
 
-      chats.forEach((chat) {
-        WsStompMessage.subscribe(
-          chatId: chat.id,
-          onMessageReceived: (chatId, message) {
-            Provider.of<ChatsProvider>(ctx, listen: false)
-                .addMessage(chatId, message);
-            // Provider.of<SelectedChatProvider>(ctx, listen: false)
-            //     .addMessageToCurrent(message);
-          },
-        );
-      });
+      // chats.forEach((chat) {
+      //   WsStompMessage.subscribe(
+      //     chatId: chat.id,
+      //     onMessageReceived: (chatId, message) {
+      //       Provider.of<ChatsProvider>(ctx, listen: false)
+      //           .addMessage(chatId, message);
+      //       // Provider.of<SelectedChatProvider>(ctx, listen: false)
+      //       //     .addMessageToCurrent(message);
+      //     },
+      //   );
+      // });
     });
     return chats;
   }

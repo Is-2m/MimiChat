@@ -30,17 +30,17 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: "${json['id']}",
-      firstName: "${json['firstName'] ?? null}",
-      lastName: "${json['lastName'] ?? null}",
+      firstName: "${json['firstName'] ?? ""}",
+      lastName: "${json['lastName'] ?? ""}",
       email: "${json['email']}",
-      phone: "${json['phone'] ?? null}",
-      bio: "${json['bio'] ?? null}",
+      phone: "${json['phone'] ?? ""}",
+      bio: "${json['bio'] ?? ""}",
       password: "${json['password']}",
       username: "${json['username']}",
-      birthDate: "${json['birthDate'] ?? null}",
-      profilePicture: "${json['profilePicture'] ?? null}",
+      birthDate: "${json['birthDate'] ?? ""}",
+      profilePicture: "${json['profilePicture'] ?? ""}",
       status: json['status'] == null
-          ? null
+          ? Status.ONLINE
           : json['status'] == Status.OFFLINE.name
               ? Status.OFFLINE
               : Status.ONLINE,
@@ -64,7 +64,7 @@ class User {
   }
 
   String get fullName {
-    return "${firstName ?? "-"} ${lastName ?? "-"}";
+    return "${firstName!.isEmpty ? "-" : firstName} ${lastName!.isEmpty ? "-" : lastName}";
   }
 
   bool isSamePersonAs(User user) {

@@ -88,15 +88,19 @@ class _ChatListPageState extends State<ChatListPage> {
                 )),
             Expanded(child:
                 Consumer<ChatsProvider>(builder: (context, chatProvider, _) {
-              return ListView.builder(
-                itemCount: chatProvider.lstChats.length,
-                itemBuilder: (context, index) {
-                  Chat chat = chatProvider.lstChats[index];
-                  return ChatListItem(
-                    chat: chat,
-                  );
-                },
-              );
+              return chatProvider.lstChats.isEmpty
+                  ? Center(
+                      child: Text("No chats found"),
+                    )
+                  : ListView.builder(
+                      itemCount: chatProvider.lstChats.length,
+                      itemBuilder: (context, index) {
+                        Chat chat = chatProvider.lstChats[index];
+                        return ChatListItem(
+                          chat: chat,
+                        );
+                      },
+                    );
             })),
           ],
         ));

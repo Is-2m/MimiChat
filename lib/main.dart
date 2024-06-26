@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mimichat/providers/CallProvider.dart';
 import 'package:mimichat/providers/ChatsProvider.dart';
 import 'package:mimichat/providers/SelectedChatProvider.dart';
 import 'package:mimichat/sockets/WsStompConfig.dart';
@@ -29,6 +30,9 @@ void main() async {
           ),
           ChangeNotifierProvider(
             create: (context) => SelectedChatProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => CallProvider(),
           )
         ],
         child: MyApp(),

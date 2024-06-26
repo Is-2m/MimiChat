@@ -3,7 +3,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 
 class MessageWebSocket {
-  final String _url = 'ws://192.168.1.100:8080';
+  final String _url = 'wss://192.168.1.100:8443';
   late WebSocketChannel channel;
 
   void connect(String userId) {

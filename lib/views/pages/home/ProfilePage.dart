@@ -20,9 +20,14 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     var user = AppStateManager.currentUser;
 
-    String name = "${user!.firstName ?? "-"} ${user.lastName ?? "-"}";
+    print("[ProfilePage] $user");
+    print(
+        "[ProfilePage] ${user!.firstName!.isEmpty} ${user.firstName == null} ${user.firstName == "null"} ");
+
+    String name =
+        "${user!.firstName!.isEmpty ? "-" : user.firstName} ${user.lastName!.isEmpty ? "-" : user.lastName}";
     String dateOfBirth = "";
-    if (user.birthDate != null) {
+    if (user.birthDate!.isNotEmpty) {
       dateOfBirth =
           DateTime.fromMillisecondsSinceEpoch(int.parse(user.birthDate!))
               .toString()
@@ -99,7 +104,21 @@ class _ProfilePageState extends State<ProfilePage> {
                               );
                               // return Image.memory(snapshot.data!);
                             } else {
-                              return Text('No image found.');
+                              return ClipRRect(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(50)),
+                                child: Material(
+                                  elevation: 2,
+                                  child: Container(
+                                    padding: EdgeInsets.all(2),
+                                    child: CircleAvatar(
+                                      radius: 50,
+                                      backgroundImage: AssetImage(
+                                          "images/user-placeholder.jpg"),
+                                    ),
+                                  ),
+                                ),
+                              );
                             }
                           },
                         ),
@@ -180,7 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.w400,
                                 color: Colors.grey[600],
                               ),
-                              text: "${user.bio ?? "-"}")),
+                              text: "${user.bio!.isEmpty ? "-" : user.bio}")),
                     ),
                     Container(
                       color: Colors.white,
@@ -279,7 +298,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     fontSize: 15, fontWeight: FontWeight.w500),
                               ),
                               subtitle: Text(
-                                  "${user.phone != "null" ? user.phone : "-"}"),
+                                  "${user.phone!.isEmpty ? "-" : user.phone}"),
                             ),
                             ListTile(
                               contentPadding:
