@@ -5,9 +5,7 @@ import 'package:mimichat/providers/SelectedChatProvider.dart';
 import 'package:mimichat/sockets/WsStompConfig.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/utils/CustomColors.dart';
-import 'package:mimichat/views/pages/auth/LoginPage.dart';
 import 'package:mimichat/views/pages/auth/Wrapper.dart';
-import 'package:mimichat/views/pages/home/HomePage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

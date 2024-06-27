@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:mimichat/dao/MessageWebSocket.dart';
 import 'package:mimichat/models/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,8 +23,6 @@ class AppStateManager {
 
   static saveCurrentUser(User? user) {
     if (user != null) {
-      final ws = MessageWebSocket();
-      // ws.connect(user!.id);
       currentUser = user;
       _cache!.setString(_currentUser_CacheName, jsonEncode(user.toJson()));
     } else {

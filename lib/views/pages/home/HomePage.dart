@@ -194,7 +194,6 @@ class _HomepageState extends State<Homepage> {
 
   Widget _buildSelectedPage(double width, String? chatID, Widget org) {
     Widget wid = Container();
-    var res = -1;
 
     if (chatID == null) {
       if (width > 700) {
@@ -202,11 +201,8 @@ class _HomepageState extends State<Homepage> {
           child: org,
           flex: width < 1100 ? 3 : 2,
         );
-        res = 1;
       } else {
         wid = Expanded(child: org);
-
-        res = 2;
       }
     } else {
       if (width > 700) {
@@ -214,8 +210,6 @@ class _HomepageState extends State<Homepage> {
           child: org,
           flex: 2,
         );
-
-        res = 3;
       }
     }
     return wid;
@@ -223,10 +217,8 @@ class _HomepageState extends State<Homepage> {
 
   Widget _buildConversationPAge(double width, String? chatID) {
     Widget wid = Container();
-    var res = -1;
     if (chatID == null) {
       if (width > 700) {
-        res = 1;
         wid = Expanded(
           child: Container(
             color: Color(0xFFF7F7FF), // Placeholder for additional content
@@ -248,118 +240,10 @@ class _HomepageState extends State<Homepage> {
           child: ConversationPage(),
           flex: 5,
         );
-        res = 2;
       } else {
         wid = Expanded(child: ConversationPage());
-        res = 3;
       }
     }
     return wid;
   }
 }
-
-
-// Container(
-                //   padding: EdgeInsets.all(20),
-                //   width: MediaQuery.of(context).size.width > 500
-                //       ? 350
-                //       : MediaQuery.of(context).size.width * 0.7,
-                //   height: 300,
-                //   decoration: BoxDecoration(
-                //     color: Color(0xFF363f48),
-                //     borderRadius: BorderRadius.circular(10),
-                //   ),
-                //   child: Column(
-                //     mainAxisAlignment: MainAxisAlignment.start,
-                //     children: [
-                //       Row(
-                //         mainAxisAlignment: MainAxisAlignment.start,
-                //         children: [
-                //           Transform.scale(
-                //             scale: width > 500 ? 1 : 0.7,
-                //             child: ClipRRect(
-                //               borderRadius: BorderRadius.all(Radius.circular(50)),
-                //               child: Material(
-                //                 elevation: 2,
-                //                 child: Container(
-                //                   padding: EdgeInsets.all(2),
-                //                   child: CircleAvatar(
-                //                     radius: 50,
-                //                     backgroundImage:
-                //                         AssetImage("images/user-placeholder.jpg"),
-                //                   ),
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //           SizedBox(width: width > 500 ? 10 : 5),
-                //           Expanded(
-                //             child: Column(
-                //               mainAxisAlignment: MainAxisAlignment.start,
-                //               crossAxisAlignment: CrossAxisAlignment.start,
-                //               children: [
-                //                 Text(
-                //                   "Amanda Henderson",
-                //                   softWrap: true,
-                //                   style: TextStyle(
-                //                       color: Colors.white,
-                //                       fontSize: 14,
-                //                       fontWeight: FontWeight.w500),
-                //                 ),
-                //                 SizedBox(height: 5),
-                //                 Text(
-                //                   "is now calling",
-                //                   style: TextStyle(color: Color(0xFFdbd7d7)),
-                //                 )
-                //               ],
-                //             ),
-                //           ),
-                //         ],
-                //       ),
-                //       SizedBox(height: 20),
-                //       Padding(
-                //         padding: const EdgeInsets.symmetric(
-                //             horizontal: 10, vertical: 10),
-                //         child: MouseRegion(
-                //           cursor: SystemMouseCursors.click,
-                //           child: GestureDetector(
-                //             child: Container(
-                //                 padding: EdgeInsets.all(10),
-                //                 alignment: Alignment.center,
-                //                 width: double.infinity,
-                //                 decoration: BoxDecoration(
-                //                   color: Color(0xFF00c3a5),
-                //                   borderRadius: BorderRadius.circular(5),
-                //                 ),
-                //                 child: Text(
-                //                   "Accept",
-                //                   style: TextStyle(color: Colors.white),
-                //                 )),
-                //           ),
-                //         ),
-                //       ),
-                //       Padding(
-                //         padding: const EdgeInsets.symmetric(
-                //             horizontal: 10, vertical: 10),
-                //         child: MouseRegion(
-                //           cursor: SystemMouseCursors.click,
-                //           child: GestureDetector(
-                //             child: Container(
-                //                 padding: EdgeInsets.all(10),
-                //                 alignment: Alignment.center,
-                //                 width: double.infinity,
-                //                 decoration: BoxDecoration(
-                //                   color: Color(0xFFe74c3c),
-                //                   borderRadius: BorderRadius.circular(5),
-                //                 ),
-                //                 child: Text(
-                //                   "Reject",
-                //                   style: TextStyle(color: Colors.white),
-                //                 )),
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-              

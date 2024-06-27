@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:mimichat/services/ImageService.dart';
 import 'package:mimichat/services/UserService.dart';
@@ -20,9 +19,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     var user = AppStateManager.currentUser;
 
-    print("[ProfilePage] $user");
-    print(
-        "[ProfilePage] ${user!.firstName!.isEmpty} ${user.firstName == null} ${user.firstName == "null"} ");
+    // print("[ProfilePage] $user");
+    // print(
+    //     "[ProfilePage] ${user!.firstName!.isEmpty} ${user.firstName == null} ${user.firstName == "null"} ");
 
     String name =
         "${user!.firstName!.isEmpty ? "-" : user.firstName} ${user.lastName!.isEmpty ? "-" : user.lastName}";

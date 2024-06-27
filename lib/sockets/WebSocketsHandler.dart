@@ -6,6 +6,7 @@ import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/Message.dart';
 import 'package:mimichat/providers/CallProvider.dart';
 import 'package:mimichat/providers/ChatsProvider.dart';
+import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:provider/provider.dart';
 
 class WebSocketsHandler {
@@ -28,6 +29,10 @@ class WebSocketsHandler {
 
   static void _handleIncomingCall(
       BuildContext ctx, Map<String, dynamic> bodyJson) {
+    print(
+        "[Handling incoming call] current user: ${AppStateManager.currentUser!.username}");
+    print("[Handling incoming call] call : ${bodyJson["data"]}");
+
     CallHistory call = CallHistory.fromJson(bodyJson["data"]);
     Provider.of<CallProvider>(ctx, listen: false).addIncomingCall(call);
   }

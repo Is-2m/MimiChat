@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mimichat/dao/ChatDAO.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/providers/ChatsProvider.dart';
-import 'package:mimichat/providers/SelectedChatProvider.dart';
-import 'package:mimichat/sockets/WsStompMessages.dart';
 import 'package:provider/provider.dart';
 
 class ChatService {

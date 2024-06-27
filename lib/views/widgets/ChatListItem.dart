@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/Message.dart';
 import 'package:mimichat/models/User.dart';
-import 'package:mimichat/providers/ChatsProvider.dart';
 import 'package:mimichat/providers/SelectedChatProvider.dart';
 import 'package:mimichat/services/ImageService.dart';
 import 'package:mimichat/utils/AppStateManager.dart';

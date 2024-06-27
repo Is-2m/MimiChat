@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:mimichat/models/Message.dart';
 import 'package:mimichat/models/User.dart';
 

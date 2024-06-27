@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mimichat/models/Chat.dart';
-import 'package:mimichat/models/Message.dart';
 
 class SelectedChatProvider extends ChangeNotifier{
   String? _selectedChat;

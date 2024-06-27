@@ -36,5 +36,6 @@ class MessageDAO {
       print("[MessageDAO.saveMessage.catch]:\n $e");
       return msgReply;
     }
+    return null;
   }
 }

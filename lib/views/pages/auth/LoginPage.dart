@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:mimichat/dao/AuthDAO.dart';
-import 'package:mimichat/models/User.dart';
 import 'package:mimichat/services/AuthService.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/utils/Navigation.dart';

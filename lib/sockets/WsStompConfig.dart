@@ -1,20 +1,17 @@
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
-import 'package:provider/provider.dart';
 
 class WsStompConfig {
   static const String WS_URL = 'wss://192.168.1.100:8443/ws';
 
   static final stompClient = StompClient(
     config: StompConfig(
-      url: "wss://192.168.1.100:8443/ws",
+      url: WsStompConfig.WS_URL,
       beforeConnect: () async {
         print('waiting to connect...');
         await Future.delayed(const Duration(milliseconds: 200));
         print('connecting...');
       },
+      
       onWebSocketError: (dynamic error) {
         print('onWebSocketError:\n${error.toString()}');
       },

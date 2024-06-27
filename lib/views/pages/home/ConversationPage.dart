@@ -1,13 +1,14 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:mimichat/dao/MessageDAO.dart';
+import 'package:mimichat/models/CallHistory.dart';
+import 'package:mimichat/models/CallState.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/Message.dart';
 import 'package:mimichat/models/User.dart';
 import 'package:mimichat/providers/ChatsProvider.dart';
 import 'package:mimichat/providers/SelectedChatProvider.dart';
+import 'package:mimichat/services/CallService.dart';
 import 'package:mimichat/services/ImageService.dart';
 import 'package:mimichat/sockets/WsStompMessages.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
@@ -17,6 +18,7 @@ import 'package:mimichat/views/widgets/chat_bubble/LeftChatBubble.dart';
 import 'package:mimichat/views/widgets/chat_bubble/RightChatBubble.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:uuid/uuid.dart';
 
 class ConversationPage extends StatefulWidget {
   ConversationPage();
@@ -46,7 +48,7 @@ class _ConversationPageState extends State<ConversationPage> {
         "date": "${DateTime.now().toUtc().millisecondsSinceEpoch}",
         "seen": false
       };
-      WsStompMessage.send(chatId: chatId, body: body);
+      WsStompMessage.sendMessage(chatId: chatId, body: body);
       _messageController.clear();
       // print("Mesg sent");
     }
@@ -116,19 +118,14 @@ class _ConversationPageState extends State<ConversationPage> {
   Widget _buildMainWidget(double width, bool _isExpnded, Widget org) {
     Widget wid = Expanded(child: org);
 
-    var res = -1;
-
     if (_isExpnded) {
       if (width > 1000) {
         wid = Expanded(
           child: org,
           flex: 3,
         );
-
-        res = 1;
       } else {
         wid = SizedBox.shrink();
-        res = 2;
       }
     }
 
@@ -140,7 +137,6 @@ class _ConversationPageState extends State<ConversationPage> {
     bool _isExpnded,
   ) {
     Widget wid = SizedBox.shrink();
-    var res = -1;
     if (_isExpnded) {
       if (width > 1000) {
         wid = AnimatedContainer(
@@ -149,7 +145,6 @@ class _ConversationPageState extends State<ConversationPage> {
             child: PersonProfile(
               onPressed: _toggleExpanded,
             ));
-        res = 2;
       } else {
         wid = Expanded(
             child: AnimatedContainer(
@@ -158,7 +153,6 @@ class _ConversationPageState extends State<ConversationPage> {
                 child: PersonProfile(
                   onPressed: _toggleExpanded,
                 )));
-        res = 3;
       }
     }
     return wid;
@@ -240,7 +234,21 @@ Widget _mainWidget(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: IconButton(
                     tooltip: "Voice Call",
-                    onPressed: () {},
+                    onPressed: () async {
+                      Uuid uuid = Uuid();
+
+                      CallHistory call = CallHistory(
+                        roomId: uuid.v4(),
+                        caller: currentUser,
+                        receiver: otherUser,
+                        date: DateTime.now(),
+                        state: CallState.MISSED,
+                      );
+                      WsStompMessage.sendCall(call: call);
+                      String callURL = CallService.getCallURL(call.roomId,
+                          currentUser.id, currentUser.username, false);
+                      await CallService.makeCall(callURL);
+                    },
                     icon: Icon(
                       Icons.phone_outlined,
                       size: 25,
@@ -251,7 +259,21 @@ Widget _mainWidget(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: IconButton(
                     tooltip: "Video Call",
-                    onPressed: () {},
+                    onPressed: () async {
+                      Uuid uuid = Uuid();
+
+                      CallHistory call = CallHistory(
+                        roomId: uuid.v4(),
+                        caller: currentUser,
+                        receiver: otherUser,
+                        date: DateTime.now(),
+                        state: CallState.MISSED,
+                      );
+
+                      String callURL = CallService.getCallURL(call.roomId,
+                          currentUser.id, currentUser.username, true);
+                      await CallService.makeCall(callURL);
+                    },
                     icon: Icon(
                       Icons.videocam_outlined,
                       size: 25,

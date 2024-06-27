@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/views/pages/auth/LoginPage.dart';

@@ -36,9 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_svg:
   flutter_chat_bubble:
-  emoji_picker_flutter:
   provider:
-  webview_flutter:
   shared_preferences:
   url_launcher:
   http:
@@ -46,7 +44,11 @@ dependencies:
   timeago:
 
   stomp_dart_client:
-  # web_socket_channel:
+
+  # emoji_picker_flutter:
+  # webview_flutter:
+
+  web_socket_channel:
 
   # zego_express_engine:
   # zego_uikit: ^2.22.8

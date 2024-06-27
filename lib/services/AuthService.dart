@@ -1,5 +1,4 @@
 import 'package:mimichat/dao/AuthDAO.dart';
-import 'package:mimichat/dao/MessageWebSocket.dart';
 import 'package:mimichat/models/User.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 

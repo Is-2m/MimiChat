@@ -2,17 +2,18 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:mimichat/models/CallHistory.dart';
+import 'package:mimichat/providers/CallProvider.dart';
 import 'package:mimichat/services/CallService.dart';
 import 'package:mimichat/services/ImageService.dart';
-import 'package:mimichat/utils/AppStateManager.dart';
+import 'package:provider/provider.dart';
 
 class IncomingCall extends StatelessWidget {
   final CallHistory call;
   bool camera = false;
   String callUrl = "";
   IncomingCall({super.key, required this.call, this.camera = false}) {
-    callUrl = CallService.getCallUrl(
-        call.id, call.receiver.id, call.receiver.username, camera);
+    callUrl = CallService.getCallURL(
+        call.roomId, call.receiver.id, call.receiver.username, camera);
   }
 
   @override
@@ -104,6 +105,12 @@ class IncomingCall extends StatelessWidget {
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
+                onTap: () {
+                  Provider.of<CallProvider>(context, listen: false)
+                      .incomingCall = null;
+                  CallService.updateCall(call);
+                  CallService.makeCall(callUrl);
+                },
                 child: Container(
                     padding: EdgeInsets.all(10),
                     alignment: Alignment.center,
@@ -124,6 +131,10 @@ class IncomingCall extends StatelessWidget {
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
+                onTap: () {
+                  Provider.of<CallProvider>(context, listen: false)
+                      .incomingCall = null;
+                },
                 child: Container(
                     padding: EdgeInsets.all(10),
                     alignment: Alignment.center,

@@ -6,9 +6,7 @@ class ChatsProvider extends ChangeNotifier {
   List<Chat> lstChats = List.empty(growable: true);
 
   void addMessage(String chatId, Message msg) {
-    print("[ChatsProvider.addMessage]");
     final chat = lstChats.firstWhere((element) => element.id == chatId);
-    print("chat is null? ${chat == null}");
 
     bool contains = false;
     for (var i = chat.messages.length - 1; i >= 0; i--) {
