@@ -27,7 +27,14 @@ class _RightChatBubbleState extends State<RightChatBubble> {
   Widget build(BuildContext context) {
     Color textColor = Colors.white;
     Color? timeColor = Colors.grey[300];
+  Future<Uint8List?>? _imageFuture;
+  
+  @override
+  void initState() {
+    super.initState();
 
+    _imageFuture = ImageService.getImage(widget.img);
+  }
     double _countWidth(String msg) {
       int length = msg.split(" ").length;
       var coff = length <= 3
@@ -99,7 +106,7 @@ class _RightChatBubbleState extends State<RightChatBubble> {
               : Container(
                   padding: EdgeInsets.only(top: 50),
                   child: FutureBuilder<Uint8List?>(
-                      future: ImageService.getImage(widget.img),
+                      future: _imageFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {

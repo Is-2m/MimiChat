@@ -58,4 +58,27 @@ class UserDAO {
       return null;
     }
   }
+
+  static Future<List<User>> searchUsersByName(String name) async {
+    List<User> users = [];
+    String url = "$_apiUrl/search/$name";
+    Uri uri = Uri.parse(url);
+    try {
+      var response = await http.get(uri);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        for (var userJs in data) {
+          var user = User.fromJson(userJs);
+          if (user.id != AppStateManager.currentUser!.id) {
+            users.add(user);
+          }
+        }
+      } else {
+        print("UserDAO.searchUsersByName().else: ${response.body}");
+      }
+    } catch (e) {
+      print("[UserDAO.searchUsersByName().catch]:\n$e");
+    }
+    return users;
+  }
 }

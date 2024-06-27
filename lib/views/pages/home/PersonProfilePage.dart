@@ -1,26 +1,28 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:mimichat/models/User.dart';
 import 'package:mimichat/services/ImageService.dart';
 import 'package:mimichat/services/UserService.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/views/pages/home/AddInfoPopup.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class PersonProfilePage extends StatefulWidget {
+  User user;
+  PersonProfilePage({super.key, required this.user});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<PersonProfilePage> createState() => _PersonProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _PersonProfilePageState extends State<PersonProfilePage> {
   @override
   Widget build(BuildContext context) {
-    var user = AppStateManager.currentUser;
+    var user = widget.user;
 
     String dateOfBirth = "";
-    if (user!.birthDate!.isNotEmpty) {
+    if (user.birthDate!.isNotEmpty) {
       dateOfBirth =
           DateTime.fromMillisecondsSinceEpoch(int.parse(user.birthDate!))
               .toString()
@@ -34,130 +36,64 @@ class _ProfilePageState extends State<ProfilePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      'My Profile',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  PopupMenuButton(
-                    iconColor: Colors.grey[500],
-                    itemBuilder: (BuildContext context) => [
-                      PopupMenuItem(
-                        child: Text(
-                          "Edit Profile",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        value: 1,
-                      ),
-                    ],
-                    onSelected: (value) {
-                      // print(value);
-                    },
-                  )
-                ],
-              ),
               Container(
                 width: double.infinity,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Stack(
-                      children: [
-                        FutureBuilder<Uint8List?>(
-                          future: ImageService.getImage(user.profilePicture!),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              return Container(
+                    FutureBuilder<Uint8List?>(
+                      future: ImageService.getImage(user.profilePicture!),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(50)),
+                            child: Material(
+                              elevation: 2,
+                              child: Container(
                                 padding: EdgeInsets.all(2),
                                 child: CircleAvatar(
                                   radius: 50,
-                                  child: Icon(Icons.person),
+                                  backgroundImage:
+                                      AssetImage("images/user-placeholder.jpg"),
                                 ),
-                              );
-                            } else if (snapshot.hasData) {
-                              return ClipRRect(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(50)),
-                                child: Material(
-                                  elevation: 2,
-                                  child: Container(
-                                    padding: EdgeInsets.all(2),
-                                    child: CircleAvatar(
-                                      radius: 50,
-                                      backgroundImage:
-                                          MemoryImage(snapshot.data!),
-                                    ),
-                                  ),
-                                ),
-                              );
-                              // return Image.memory(snapshot.data!);
-                            } else {
-                              return Container(
+                              ),
+                            ),
+                          );
+                        } else if (snapshot.hasData) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(50)),
+                            child: Material(
+                              elevation: 2,
+                              child: Container(
                                 padding: EdgeInsets.all(2),
                                 child: CircleAvatar(
                                   radius: 50,
-                                  child: Icon(Icons.person),
+                                  backgroundImage: MemoryImage(snapshot.data!),
                                 ),
-                              );
-                            }
-                          },
-                        ),
-                        Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(50)),
                               ),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.add_a_photo_outlined,
-                                  color: CustomColors.purpple,
+                            ),
+                          );
+                          // return Image.memory(snapshot.data!);
+                        } else {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(50)),
+                            child: Material(
+                              elevation: 2,
+                              child: Container(
+                                padding: EdgeInsets.all(2),
+                                child: CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage:
+                                      AssetImage("images/user-placeholder.jpg"),
                                 ),
-                                onPressed: () {
-                                  ImageService.pickFile().then((value) {
-                                    if (value != null) {
-                                      UserService.updateProfileImage(
-                                              user.id, value)
-                                          .then((value) {
-                                        if (value != null) {
-                                          setState(() {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              content: Text(
-                                                  "Profile picture updated successfully"),
-                                              backgroundColor:
-                                                  CustomColors.purpple,
-                                            ));
-                                          });
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                            content: Text(
-                                                "Failed to update profile picture"),
-                                            backgroundColor: Colors.red,
-                                          ));
-                                        }
-                                      });
-                                    }
-                                  });
-                                },
                               ),
-                            ))
-                      ],
+                            ),
+                          );
+                        }
+                      },
                     ),
                     Padding(
                       padding: EdgeInsets.only(top: 10, bottom: 5),

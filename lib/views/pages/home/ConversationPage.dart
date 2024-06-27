@@ -30,6 +30,7 @@ class ConversationPage extends StatefulWidget {
 class _ConversationPageState extends State<ConversationPage> {
   TextEditingController _messageController = TextEditingController();
   bool _isExpanded = false;
+
   void _toggleExpanded() {
     setState(() {
       _isExpanded = !_isExpanded;
@@ -53,11 +54,6 @@ class _ConversationPageState extends State<ConversationPage> {
       // print("Mesg sent");
     }
     return result;
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -227,7 +223,7 @@ Widget _mainWidget(
               ),
               width > 600
                   ? SizedBox(
-                      width: width * 0.5,
+                      width: width * 0.3,
                     )
                   : SizedBox.shrink(),
               Container(

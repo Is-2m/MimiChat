@@ -25,7 +25,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("ChatListPage.build");
+    // print("ChatListPage.build");
     return Container(
         color: Color(0xFFF5F7FB),
         padding: EdgeInsets.all(10),
@@ -96,9 +96,11 @@ class _ChatListPageState extends State<ChatListPage> {
                       itemCount: chatProvider.lstChats.length,
                       itemBuilder: (context, index) {
                         Chat chat = chatProvider.lstChats[index];
-                        return ChatListItem(
-                          chat: chat,
-                        );
+                        return chat.messages.length == 0
+                            ? Container()
+                            : ChatListItem(
+                                chat: chat,
+                              );
                       },
                     );
             })),

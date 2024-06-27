@@ -15,6 +15,7 @@ import 'package:mimichat/views/pages/home/ChatListPage.dart';
 import 'package:mimichat/views/pages/home/ContactsPage.dart';
 import 'package:mimichat/views/pages/home/ConversationPage.dart';
 import 'package:mimichat/views/pages/home/ProfilePage.dart';
+import 'package:mimichat/views/pages/home/SearchPage.dart';
 import 'package:mimichat/views/widgets/IncomingCall.dart';
 import 'package:provider/provider.dart';
 
@@ -45,7 +46,8 @@ class _HomepageState extends State<Homepage> {
     _selectedIndex = widget.selectedIndex ?? 0;
     _pages = [
       ChatListPage(),
-      Contactspage(),
+      // Contactspage(),
+      SearchPage(),
       ProfilePage(),
     ];
   }
@@ -77,8 +79,8 @@ class _HomepageState extends State<Homepage> {
               Container(
                 width: 80,
                 color: Colors.white,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                child: ListView(
+                  scrollDirection: Axis.vertical,
                   children: [
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 10),
@@ -96,6 +98,7 @@ class _HomepageState extends State<Homepage> {
                           : Colors.white,
                       padding: EdgeInsets.all(10),
                       child: IconButton(
+                        tooltip: "Chats",
                         padding: EdgeInsets.all(10),
                         icon: Icon(
                           Icons.chat_bubble_outline,
@@ -113,6 +116,7 @@ class _HomepageState extends State<Homepage> {
                           : Colors.white,
                       padding: EdgeInsets.all(10),
                       child: IconButton(
+                        tooltip: "Contacts",
                         padding: EdgeInsets.all(10),
                         icon: Icon(
                           Icons.contacts_outlined,
@@ -124,12 +128,31 @@ class _HomepageState extends State<Homepage> {
                         onPressed: () => _onItemTapped(1),
                       ),
                     ),
+                    // Container(
+                    //   color: _selectedIndex == 2
+                    //       ? CustomColors.BG_Grey
+                    //       : Colors.white,
+                    //   padding: EdgeInsets.all(10),
+                    //   child: IconButton(
+                    //     tooltip: "Search",
+                    //     padding: EdgeInsets.all(10),
+                    //     icon: Icon(
+                    //       Icons.search_outlined,
+                    //       color: _selectedIndex == 2
+                    //           ? CustomColors.purpple
+                    //           : Colors.grey[500],
+                    //       size: 30,
+                    //     ),
+                    //     onPressed: () => _onItemTapped(2),
+                    //   ),
+                    // ),
                     Container(
                       color: _selectedIndex == 2
                           ? CustomColors.BG_Grey
                           : Colors.white,
                       padding: EdgeInsets.all(10),
                       child: IconButton(
+                        tooltip: "Profile",
                         padding: EdgeInsets.all(10),
                         icon: Icon(
                           Icons.person_outline,

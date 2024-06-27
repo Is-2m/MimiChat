@@ -20,9 +20,21 @@ class ChatListItem extends StatefulWidget {
 
 class _ChatListItemState extends State<ChatListItem> {
   User currentUser = AppStateManager.currentUser!;
+  Future<Uint8List?>? _imageFuture;
+  @override
+  void initState() {
+    super.initState();
+    if (AppStateManager.currentUser!.id == widget.chat.sender.id) {
+      _imageFuture =
+          ImageService.getImage(widget.chat.receiver.profilePicture!);
+    }else{
+      _imageFuture = ImageService.getImage(widget.chat.sender.profilePicture!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    print("ChatListItem.build");
+    // print("ChatListItem.build");
     User sender = widget.chat.sender;
     User receiver = widget.chat.receiver;
     bool isSender = currentUser.isSamePersonAs(sender);
@@ -48,7 +60,7 @@ class _ChatListItemState extends State<ChatListItem> {
                   child: Text(
                       '${isSender ? receiver.fullName : sender.fullName}',
                       style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500))),
+                          fontSize: 14, fontWeight: FontWeight.w600))),
               Spacer(),
               Text('${timeago.format(lastMsg.date, locale: 'en_short')}',
                   style: TextStyle(fontSize: 12)),
@@ -63,9 +75,7 @@ class _ChatListItemState extends State<ChatListItem> {
             child: Transform.scale(
               scale: 1.1,
               child: FutureBuilder<Uint8List?>(
-                future: ImageService.getImage(isSender
-                    ? receiver.profilePicture!
-                    : sender.profilePicture!),
+                future: _imageFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();

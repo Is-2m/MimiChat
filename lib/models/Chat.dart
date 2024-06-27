@@ -1,5 +1,6 @@
 import 'package:mimichat/models/Message.dart';
 import 'package:mimichat/models/User.dart';
+import 'package:mimichat/utils/AppStateManager.dart';
 
 class Chat {
   String id;
@@ -35,6 +36,7 @@ class Chat {
     };
   }
 
-  
+  User getOtherUser() {
+    return AppStateManager.currentUser!.id == sender.id ? receiver : sender;
+  }
 }
-

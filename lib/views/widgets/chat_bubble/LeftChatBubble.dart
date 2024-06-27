@@ -25,6 +25,14 @@ class LeftChatBubble extends StatefulWidget {
 class _LeftChatBubbleState extends State<LeftChatBubble> {
   Color textColor = Colors.black;
   Color? timeColor = Colors.grey[800];
+  Future<Uint8List?>? _imageFuture;
+  
+  @override
+  void initState() {
+    super.initState();
+
+    _imageFuture = ImageService.getImage(widget.img);
+  }
 
   double _countWidth(String msg) {
     int length = msg.split(" ").length;
@@ -47,7 +55,7 @@ class _LeftChatBubbleState extends State<LeftChatBubble> {
               : Container(
                   padding: EdgeInsets.only(top: 50),
                   child: FutureBuilder<Uint8List?>(
-                      future: ImageService.getImage(widget.img),
+                      future: _imageFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {

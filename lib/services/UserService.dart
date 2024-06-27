@@ -8,7 +8,6 @@ class UserService {
     bool isUpdated = false;
     await UserDAO.updateUser(user).then((val) {
       if (val != null) {
-        print("val: $val");
         AppStateManager.saveCurrentUser(val);
         isUpdated = true;
       }
@@ -28,5 +27,13 @@ class UserService {
       }
     });
     return result;
+  }
+
+  static Future<List<User>> searchUsersByName(String name) async {
+    List<User> users = [];
+    await UserDAO.searchUsersByName(name).then((val) {
+      users = val;
+    });
+    return users;
   }
 }
