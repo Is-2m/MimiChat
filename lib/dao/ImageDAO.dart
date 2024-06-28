@@ -14,13 +14,15 @@ class ImageDAO {
       String fileName =
           "User${userID}_${DateTime.now().toUtc().millisecondsSinceEpoch}.png";
 
-      var request =
-          http.MultipartRequest('POST', Uri.parse("${_apiURL}/upload/$userID"))
-            ..files.add(http.MultipartFile.fromBytes(
-              'file',
-              fileBytes,
-              filename: fileName,
-            ));
+      var request = http.MultipartRequest(
+          'POST', Uri.parse("${_apiURL}/upload/$userID"))
+        ..files.add(http.MultipartFile.fromBytes(
+          'file',
+          fileBytes,
+          filename: fileName,
+        ))
+        ..headers
+            .addAll({"Authorization": "Bearer ${AppStateManager.getToken()}"});
 
       var response = await request.send();
 
@@ -39,7 +41,13 @@ class ImageDAO {
 
   static Future<Uint8List?> getImage(String filename) async {
     try {
-      final response = await http.get(Uri.parse("$_apiURL/$filename"));
+      final response = await http.get(
+        Uri.parse("$_apiURL/$filename"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${AppStateManager.getToken()}"
+        },
+      );
 
       if (response.statusCode == 200) {
         return response.bodyBytes;

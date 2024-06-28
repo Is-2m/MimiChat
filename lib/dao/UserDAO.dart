@@ -14,7 +14,11 @@ class UserDAO {
       var body = jsonEncode(user.toJson());
       print(user);
       var response = await http.put(Uri.parse("$_apiUrl/${user.id}"),
-          headers: {"Content-Type": "application/json"}, body: body);
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${AppStateManager.getToken()}"
+          },
+          body: body);
 
       print("response.body: ${response.body}\nBody: $body");
       if (response.statusCode == 200) {
@@ -42,7 +46,9 @@ class UserDAO {
           'file',
           fileBytes,
           filename: fileName,
-        ));
+        ))
+        ..headers
+            .addAll({"Authorization": "Bearer ${AppStateManager.getToken()}"});
 
       var response = await request.send();
 
@@ -64,7 +70,13 @@ class UserDAO {
     String url = "$_apiUrl/search/$name";
     Uri uri = Uri.parse(url);
     try {
-      var response = await http.get(uri);
+      var response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${AppStateManager.getToken()}"
+        },
+      );
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         for (var userJs in data) {

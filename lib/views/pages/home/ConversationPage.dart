@@ -104,7 +104,7 @@ class _ConversationPageState extends State<ConversationPage> {
                     _toggleExpanded,
                     sendMessage,
                     width)),
-            _buildProfileWidget(width, _isExpanded)
+            _buildProfileWidget(width, _isExpanded, otherUser)
           ],
         ),
       );
@@ -131,6 +131,7 @@ class _ConversationPageState extends State<ConversationPage> {
   Widget _buildProfileWidget(
     double width,
     bool _isExpnded,
+    User otherUser,
   ) {
     Widget wid = SizedBox.shrink();
     if (_isExpnded) {
@@ -140,6 +141,7 @@ class _ConversationPageState extends State<ConversationPage> {
             width: width / 3.5,
             child: PersonProfile(
               onPressed: _toggleExpanded,
+              user: otherUser,
             ));
       } else {
         wid = Expanded(
@@ -148,6 +150,7 @@ class _ConversationPageState extends State<ConversationPage> {
                 width: width,
                 child: PersonProfile(
                   onPressed: _toggleExpanded,
+                  user: otherUser,
                 )));
       }
     }
@@ -322,33 +325,38 @@ Widget _mainWidget(
       Flexible(
         child: Consumer<ChatsProvider>(
           builder: (context, chatsProv, _) {
-            return ListView.builder(
-              reverse: true,
-              itemCount: chatsProv
-                  .getCurrentChat(selChaProvider.selectedChat!)
-                  .messages
-                  .length,
-              itemBuilder: (context, index) {
-                var chat =
-                    chatsProv.getCurrentChat(selChaProvider.selectedChat!);
-                int reversedIndex = chat.messages.length - index - 1;
-                Message msg = chat.messages[reversedIndex];
-                bool amISender = msg.sender.isSamePersonAs(currentUser);
-                return amISender
-                    ? RightChatBubble(
-                        img: "${msg.sender.profilePicture}",
-                        message: "${msg.content}",
-                        time: "${timeago.format(msg.date, locale: 'en_short')}",
-                        isExpanded: _isExpanded,
-                      )
-                    : LeftChatBubble(
-                        img: "${msg.sender.profilePicture}",
-                        message: "${msg.content}",
-                        time: "${timeago.format(msg.date, locale: 'en_short')}",
-                        isExpanded: _isExpanded,
-                      );
-              },
-            );
+            var msgLength = chatsProv
+                .getCurrentChat(selChaProvider.selectedChat!)
+                .messages!
+                .length;
+            return msgLength == 0
+                ? Container()
+                : ListView.builder(
+                    reverse: true,
+                    itemCount: msgLength,
+                    itemBuilder: (context, index) {
+                      var chat = chatsProv
+                          .getCurrentChat(selChaProvider.selectedChat!);
+                      int reversedIndex = chat.messages!.length - index - 1;
+                      Message msg = chat.messages![reversedIndex];
+                      bool amISender = msg.sender.isSamePersonAs(currentUser);
+                      return amISender
+                          ? RightChatBubble(
+                              img: "${msg.sender.profilePicture}",
+                              message: "${msg.content}",
+                              time:
+                                  "${timeago.format(msg.date, locale: 'en_short')}",
+                              isExpanded: _isExpanded,
+                            )
+                          : LeftChatBubble(
+                              img: "${msg.sender.profilePicture}",
+                              message: "${msg.content}",
+                              time:
+                                  "${timeago.format(msg.date, locale: 'en_short')}",
+                              isExpanded: _isExpanded,
+                            );
+                    },
+                  );
           },
         ),
       ),

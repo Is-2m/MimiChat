@@ -4,9 +4,6 @@ import 'package:mimichat/models/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStateManager {
-  // static int id = 130271211;
-  // static String signIn =
-  //     "a91961d9a72a5a8fe6aa2f70387b995ed7fbce67e4667e009206e515c89b52fa";
 
   static int VVCall_ID = 1137855613;
   static String VVCall_signIn =
@@ -43,6 +40,14 @@ class AppStateManager {
         Map<String, dynamic>.from(jsonDecode(userJson));
     currentUser = User.fromJson(userMap);
     return currentUser;
+  }
+
+  static setToken(String token) {
+    _cache!.setString("token", token);
+  }
+
+  static getToken() {
+    return _cache!.getString("token");
   }
 
   static setCache(SharedPreferences cache) {

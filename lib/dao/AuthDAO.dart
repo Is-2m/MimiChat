@@ -23,7 +23,9 @@ class AuthDAO {
       print(response);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        return User.fromJson(data);
+
+        AppStateManager.setToken(data["jwt"]);
+        return User.fromJson(data["user"]);
       } else {
         return null;
       }
@@ -48,7 +50,9 @@ class AuthDAO {
       );
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        return User.fromJson(data);
+
+        AppStateManager.setToken(data["jwt"]);
+        return User.fromJson(data["user"]);
       } else {
         print("[AuthDAO.register().else] An Error Occurred: ${response.body}");
         return null;

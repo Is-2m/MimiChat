@@ -96,7 +96,7 @@ class _ChatListPageState extends State<ChatListPage> {
                       itemCount: chatProvider.lstChats.length,
                       itemBuilder: (context, index) {
                         Chat chat = chatProvider.lstChats[index];
-                        return chat.messages.length == 0
+                        return chat.messages!.length == 0
                             ? Container()
                             : ChatListItem(
                                 chat: chat,

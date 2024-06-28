@@ -9,7 +9,10 @@ class CallHistoryDAO {
     var url = '$_apiUrl/${call.id}';
     Uri uri = Uri.parse(url);
     try {
-      final response = await http.put(uri, body: call.toJson());
+      final response = await http.put(uri, body: call.toJson(), headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${AppStateManager.getToken()}"
+      });
       if (response.statusCode == 200) {
         print("[CallHistoryDAO.updateCall]: Call updated successfully");
       } else {

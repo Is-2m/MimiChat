@@ -26,4 +26,8 @@ class ChatService {
     });
     return chats;
   }
+
+  static Future<Chat?> createChat(Chat chat) async {
+    return await ChatDao.createChat(chat);
+  }
 }

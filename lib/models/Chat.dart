@@ -3,16 +3,16 @@ import 'package:mimichat/models/User.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 
 class Chat {
-  String id;
+  String? id;
   User sender;
   User receiver;
-  List<Message> messages;
+  List<Message>? messages;
 
   Chat({
-    required this.id,
+    this.id,
     required this.sender,
     required this.receiver,
-    required this.messages,
+    this.messages,
   });
 
   factory Chat.fromJson(Map<String, dynamic> json) {
@@ -32,7 +32,7 @@ class Chat {
       'id': id,
       'sender': sender.toJson(),
       'receiver': receiver.toJson(),
-      'messageList': messages.map((message) => message.toJson()).toList(),
+      'messageList': messages!.map((message) => message.toJson()).toList(),
     };
   }
 

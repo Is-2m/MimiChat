@@ -9,8 +9,8 @@ class ChatsProvider extends ChangeNotifier {
     final chat = lstChats.firstWhere((element) => element.id == chatId);
 
     bool contains = false;
-    for (var i = chat.messages.length - 1; i >= 0; i--) {
-      if (chat.messages[i].isSameMsgAs(msg)) {
+    for (var i = chat.messages!.length - 1; i >= 0; i--) {
+      if (chat.messages![i].isSameMsgAs(msg)) {
         contains = true;
         break;
       }
@@ -21,8 +21,8 @@ class ChatsProvider extends ChangeNotifier {
     if (!contains) {
       print("[In if]");
 
-      chat.messages.add(msg);
-      print("Message Added: ${chat.messages.last} ");
+      chat.messages!.add(msg);
+      print("Message Added: ${chat.messages!.last} ");
       notifyListeners();
     }
     return;
@@ -41,6 +41,17 @@ class ChatsProvider extends ChangeNotifier {
     lstChats.addAll(chats);
     notifyListeners();
     return;
+  }
+
+  Chat? getChatByUserId(String userID) {
+    Chat? chat = null;
+    for (Chat c in lstChats) {
+      if (c.sender.id == userID || c.receiver.id == userID) {
+        chat = c;
+        break;
+      }
+    }
+    return chat;
   }
 
   Chat getCurrentChat(String chatId) {

@@ -38,7 +38,7 @@ class _ChatListItemState extends State<ChatListItem> {
     User sender = widget.chat.sender;
     User receiver = widget.chat.receiver;
     bool isSender = currentUser.isSamePersonAs(sender);
-    Message lastMsg = widget.chat.messages.last;
+    Message lastMsg = widget.chat.messages!.last;
     SelectedChatProvider selChaProvider =
         Provider.of<SelectedChatProvider>(context, listen: false);
 
@@ -50,7 +50,7 @@ class _ChatListItemState extends State<ChatListItem> {
             side: BorderSide(color: Colors.transparent),
           ),
           onTap: () {
-            selChaProvider.selectChat(widget.chat.id);
+            selChaProvider.selectChat(widget.chat.id!);
           },
           hoverColor: Colors.grey[300],
           title: Row(

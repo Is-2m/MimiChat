@@ -42,6 +42,7 @@ dependencies:
   http:
   file_picker:
   timeago:
+  collection:
 
   stomp_dart_client:
 
