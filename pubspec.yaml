@@ -34,34 +34,17 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  flutter_svg:
-  flutter_chat_bubble:
-  provider:
-  shared_preferences:
-  url_launcher:
-  http:
-  file_picker:
-  timeago:
-  collection:
-
-  stomp_dart_client:
-
-  # emoji_picker_flutter:
-  # webview_flutter:
-
-  web_socket_channel:
-
-  # zego_express_engine:
-  # zego_uikit: ^2.22.8
-  # zego_uikit_prebuilt_call:
-  # zego_uikit_signaling_plugin: ^2.7.12
-
-  uuid:
-
-  permission_handler:
-  permission_handler_web:
-
-  # intl_phone_number_input:
+  flutter_svg: ^2.0.9
+  flutter_chat_bubble: ^2.0.2
+  provider: ^6.1.2
+  shared_preferences: ^2.2.3
+  url_launcher: ^6.3.0
+  http: ^0.13.6
+  file_picker: ^6.2.1
+  timeago: ^3.6.1
+  collection: ^1.18.0
+  uuid: ^4.4.0
+  stomp_dart_client: ^2.0.0
 
 dev_dependencies:
   flutter_test:

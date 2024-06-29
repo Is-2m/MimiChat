@@ -8,6 +8,8 @@ import 'package:mimichat/utils/CustomColors.dart';
 import 'package:mimichat/views/pages/auth/Wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
@@ -19,6 +21,8 @@ void main() async {
 
   await SharedPreferences.getInstance().then((cache) {
     AppStateManager.setCache(cache);
+
+    usePathUrlStrategy(); 
 
     runApp(
       MultiProvider(

@@ -4,13 +4,13 @@ import 'package:mimichat/models/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStateManager {
-
   static int VVCall_ID = 1137855613;
   static String VVCall_signIn =
       "715fd0ae2eda4f27f17d2dd5b32514ba58d3bfdf634794d841645b03e5f79026";
 
-  static final String apiURL = "https://192.168.1.100:8443/api";
-  static final String videoUrl = "https://192.168.1.100:8443/videocall.html";
+  static final String apiURL = "https://mimichat-backend.onrender.com/api";
+  static final String videoUrl =
+      "https://mimichat-backend.onrender.com/videocall.html";
 
   static SharedPreferences? _cache;
   static final String _currentUser_CacheName = "currentUser";

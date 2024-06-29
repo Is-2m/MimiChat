@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 5,
                 ),
                 Text(
-                  "Sign in to continue to MimiChat. ${size.width}",
+                  "Sign in to continue to MimiChat.",
                   style: TextStyle(color: Color(0xFF8B8FA7)),
                 ),
                 Container(
