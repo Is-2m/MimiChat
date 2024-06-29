@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:mimichat/models/User.dart';
 import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart' as http_parser;
 
 class UserDAO {
   static String _apiUrl = AppStateManager.apiURL + "/users";
@@ -35,17 +36,21 @@ class UserDAO {
   static Future<String?> updateProfilePicture(
       String userID, PlatformFile selectedImage) async {
     String apiURL = "${AppStateManager.apiURL}/profile-pictures/upload/$userID";
-    print(apiURL);
+    // print(apiURL);
     try {
       Uint8List fileBytes = selectedImage.bytes!;
+
       String fileName =
-          "User${userID}_${DateTime.now().toUtc().millisecondsSinceEpoch}.png";
+          "User${userID}_${DateTime.now().toUtc().millisecondsSinceEpoch}.${selectedImage.extension}";
+      String contentType = _getContentType(selectedImage.extension ?? '');
+
 
       var request = http.MultipartRequest('POST', Uri.parse(apiURL))
         ..files.add(http.MultipartFile.fromBytes(
           'file',
           fileBytes,
           filename: fileName,
+          contentType: http_parser.MediaType.parse(contentType),
         ))
         ..headers
             .addAll({"Authorization": "Bearer ${AppStateManager.getToken()}"});
@@ -62,6 +67,24 @@ class UserDAO {
     } catch (e) {
       print('Error: $e');
       return null;
+    }
+  }
+
+  static String _getContentType(String extension) {
+    switch (extension.toLowerCase()) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'bmp':
+        return 'image/bmp';
+      case 'webp':
+        return 'image/webp';
+      default:
+        return 'application/octet-stream';
     }
   }
 

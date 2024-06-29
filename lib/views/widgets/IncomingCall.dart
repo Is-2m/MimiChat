@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:mimichat/models/CallHistory.dart';
 import 'package:mimichat/providers/CallProvider.dart';
@@ -43,35 +44,49 @@ class IncomingCall extends StatelessWidget {
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (snapshot.hasData) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(50)),
+                      return AvatarGlow(
                         child: Material(
-                          elevation: 2,
-                          child: Container(
-                            padding: EdgeInsets.all(2),
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundImage: MemoryImage(snapshot.data!),
+                          // Replace this child with your own
+                          elevation: 8.0,
+                          shape: CircleBorder(),
+                          child: CircleAvatar(
+                            backgroundColor: Colors.grey[100],
+                            child: Image.memory(
+                              snapshot.data!,
+                              height: 50,
                             ),
+                            radius: 30.0,
                           ),
                         ),
                       );
                       // return Image.memory(snapshot.data!);
                     } else {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(50)),
+                      return AvatarGlow(
+                        animate: true,
                         child: Material(
-                          elevation: 2,
-                          child: Container(
-                            padding: EdgeInsets.all(2),
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundImage:
-                                  AssetImage("images/user-placeholder.jpg"),
-                            ),
+                          elevation: 8.0,
+                          shape: CircleBorder(),
+                          child: CircleAvatar(
+                            backgroundColor: Colors.grey[100],
+                            child: Icon(Icons.person),
+                            radius: 30.0,
                           ),
                         ),
                       );
+                      // ClipRRect(
+                      //   borderRadius: BorderRadius.all(Radius.circular(50)),
+                      //   child: Material(
+                      //     elevation: 2,
+                      //     child: Container(
+                      //       padding: EdgeInsets.all(2),
+                      //       child: CircleAvatar(
+                      //         radius: 50,
+                      //         backgroundImage:
+                      //             AssetImage("images/user-placeholder.jpg"),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // );
                     }
                   },
                 ),
@@ -105,10 +120,10 @@ class IncomingCall extends StatelessWidget {
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
-                onTap: () {
-                  Provider.of<CallProvider>(context, listen: false)
+                onTap: () async {
+                  Provider.of<CallProvider>(context, listen: true)
                       .incomingCall = null;
-                  CallService.updateCall(call);
+                  await CallService.updateCall(call);
                   CallService.makeCall(callUrl);
                 },
                 child: Container(
@@ -132,7 +147,7 @@ class IncomingCall extends StatelessWidget {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () {
-                  Provider.of<CallProvider>(context, listen: false)
+                  Provider.of<CallProvider>(context, listen: true)
                       .incomingCall = null;
                 },
                 child: Container(

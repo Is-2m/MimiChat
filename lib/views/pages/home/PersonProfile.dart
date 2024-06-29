@@ -54,30 +54,34 @@ class _PersonProfileState extends State<PersonProfile> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: CustomColors.BG_Grey,
-                      borderRadius: BorderRadius.all(Radius.circular(50))),
-                  child: FutureBuilder<Uint8List?>(
-                    future: _imageFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return CircleAvatar(
-                          child: Icon(Icons.error),
-                        );
-                      } else if (snapshot.hasData) {
-                        return CircleAvatar(
-                          backgroundImage: MemoryImage(snapshot.data!),
-                        );
-                      } else {
-                        return CircleAvatar(
-                          child: Icon(Icons.person),
-                        );
-                      }
-                    },
+                Transform.scale(
+                  scale: 2,
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        color: CustomColors.BG_Grey,
+                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                    child: FutureBuilder<Uint8List?>(
+                      future: _imageFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return CircleAvatar(
+                            child: Icon(Icons.error),
+                          );
+                        } else if (snapshot.hasData) {
+                          return CircleAvatar(
+                            backgroundImage: MemoryImage(snapshot.data!),
+                          );
+                        } else {
+                          return CircleAvatar(
+                            child: Icon(Icons.person),
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ),
                 Padding(

@@ -41,18 +41,19 @@ class ImageDAO {
 
   static Future<Uint8List?> getImage(String filename) async {
     try {
-      final response = await http.get(
-        Uri.parse("$_apiURL/$filename"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${AppStateManager.getToken()}"
-        },
-      );
+      final response = await http.get(Uri.parse(filename));
 
       if (response.statusCode == 200) {
-        return response.bodyBytes;
+        String? contentType = response.headers['content-type'];
+        if (contentType != null && contentType.startsWith('image/')) {
+          return response.bodyBytes;
+        } else {
+          print('Received content is not an image. Content-Type: $contentType');
+          // print(response.body);
+          return null;
+        }
       } else {
-        print('Failed to load image.');
+        print('Failed to load image. Status code: ${response.statusCode}');
         return null;
       }
     } catch (e) {
