@@ -11,4 +11,9 @@ class CallProvider extends ChangeNotifier {
     }
     return;
   }
+
+  void removeIncomingCall() {
+    incomingCall = null;
+    notifyListeners();
+  }
 }

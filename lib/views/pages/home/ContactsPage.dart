@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/User.dart';
 import 'package:mimichat/providers/ChatsProvider.dart';
 import 'package:mimichat/providers/SelectedChatProvider.dart';
@@ -87,7 +88,7 @@ class _ContactsPageState extends State<ContactsPage> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Fvorites",
+                "Favorites",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -106,86 +107,105 @@ class _ContactsPageState extends State<ContactsPage> {
                             SizedBox(width: 4),
                         itemCount: chatProvider.lstChats.length,
                         itemBuilder: (context, index) {
-                          User otherUser =
-                              chatProvider.lstChats[index].getOtherUser();
-                          return MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                              onTap: () {
-                                selChaProvider.selectChat(
-                                    chatProvider.lstChats[index].id!);
-                              },
-                              child: Container(
-                                height: 90,
-                                child: Stack(
-                                  children: [
-                                    Positioned(
-                                      bottom: 0,
-                                      child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 5),
-                                          width: 100,
-                                          height: 50,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            color: Color(0xFFE6EBF5),
-                                            borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(10),
-                                                topRight: Radius.circular(10)),
+                          Chat currChat = chatProvider.lstChats[index];
+
+                          return (!currChat.amISender() &&
+                                  currChat.isChatEmpty())
+                              ? SizedBox.shrink()
+                              : MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      selChaProvider.selectChat(
+                                          chatProvider.lstChats[index].id!);
+                                    },
+                                    child: Container(
+                                      height: 90,
+                                      child: Stack(
+                                        children: [
+                                          Positioned(
+                                            bottom: 0,
+                                            child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5),
+                                                width: 100,
+                                                height: 50,
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                  color: Color(0xFFE6EBF5),
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  10),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  10)),
+                                                ),
+                                                child: Text(
+                                                  currChat
+                                                      .getOtherUser()
+                                                      .firstName!,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                )),
                                           ),
-                                          child: Text(
-                                            otherUser.firstName!,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
+                                          Container(
+                                            height: 75,
+                                            alignment: Alignment.topCenter,
+                                            child: Transform.scale(
+                                              scale: 0.8,
+                                              child: FutureBuilder<Uint8List?>(
+                                                future: ImageService.getImage(
+                                                    currChat
+                                                        .getOtherUser()
+                                                        .profilePicture!),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return CircularProgressIndicator();
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Container(
+                                                      padding:
+                                                          EdgeInsets.all(2),
+                                                      child: CircleAvatar(
+                                                        radius: 50,
+                                                        child:
+                                                            Icon(Icons.person),
+                                                      ),
+                                                    );
+                                                  } else if (snapshot.hasData) {
+                                                    return CircleAvatar(
+                                                      radius: 50,
+                                                      backgroundImage:
+                                                          MemoryImage(
+                                                              snapshot.data!),
+                                                    );
+                                                    // return Image.memory(snapshot.data!);
+                                                  } else {
+                                                    return Container(
+                                                      padding:
+                                                          EdgeInsets.all(2),
+                                                      child: CircleAvatar(
+                                                        radius: 50,
+                                                        child:
+                                                            Icon(Icons.person),
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              ),
                                             ),
-                                          )),
-                                    ),
-                                    Container(
-                                      height: 75,
-                                      alignment: Alignment.topCenter,
-                                      child: Transform.scale(
-                                        scale: 0.8,
-                                        child: FutureBuilder<Uint8List?>(
-                                          future: ImageService.getImage(
-                                              otherUser.profilePicture!),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.waiting) {
-                                              return CircularProgressIndicator();
-                                            } else if (snapshot.hasError) {
-                                              return Container(
-                                                padding: EdgeInsets.all(2),
-                                                child: CircleAvatar(
-                                                  radius: 50,
-                                                  child: Icon(Icons.person),
-                                                ),
-                                              );
-                                            } else if (snapshot.hasData) {
-                                              return CircleAvatar(
-                                                radius: 50,
-                                                backgroundImage:
-                                                    MemoryImage(snapshot.data!),
-                                              );
-                                              // return Image.memory(snapshot.data!);
-                                            } else {
-                                              return Container(
-                                                padding: EdgeInsets.all(2),
-                                                child: CircleAvatar(
-                                                  radius: 50,
-                                                  child: Icon(Icons.person),
-                                                ),
-                                              );
-                                            }
-                                          },
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
+                                  ),
+                                );
                         },
                       ),
                     );

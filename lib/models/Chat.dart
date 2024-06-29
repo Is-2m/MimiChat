@@ -39,4 +39,12 @@ class Chat {
   User getOtherUser() {
     return AppStateManager.currentUser!.id == sender.id ? receiver : sender;
   }
+
+  bool amISender() {
+    return AppStateManager.currentUser!.id == sender.id;
+  }
+
+  bool isChatEmpty() {
+    return messages!.isEmpty;
+  }
 }

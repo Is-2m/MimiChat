@@ -66,10 +66,7 @@ class _IncomingCallState extends State<IncomingCall> {
                           shape: CircleBorder(),
                           child: CircleAvatar(
                             backgroundColor: Colors.grey[100],
-                            child: Image.memory(
-                              snapshot.data!,
-                              height: 50,
-                            ),
+                            backgroundImage: MemoryImage(snapshot.data!),
                             radius: 30.0,
                           ),
                         ),
@@ -136,8 +133,7 @@ class _IncomingCallState extends State<IncomingCall> {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () async {
-                  Provider.of<CallProvider>(context, listen: true)
-                      .incomingCall = null;
+                  Provider.of<CallProvider>(context).removeIncomingCall();
                   await CallService.updateCall(widget.call);
                   CallService.makeCall(widget.callUrl);
                 },
@@ -162,8 +158,7 @@ class _IncomingCallState extends State<IncomingCall> {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () {
-                  Provider.of<CallProvider>(context, listen: true)
-                      .incomingCall = null;
+                  Provider.of<CallProvider>(context).removeIncomingCall();
                 },
                 child: Container(
                     padding: EdgeInsets.all(10),
