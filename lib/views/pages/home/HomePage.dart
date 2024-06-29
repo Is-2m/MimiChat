@@ -86,7 +86,7 @@ class _HomepageState extends State<Homepage> {
                         children: [
                           Container(
                             padding: EdgeInsets.symmetric(vertical: 10),
-                            child: SvgPicture.asset('images/logo.svg',
+                            child: SvgPicture.asset('assets/images/logo.svg',
                                 width: 40,
                                 height: 40,
                                 colorFilter: ColorFilter.mode(
@@ -252,7 +252,7 @@ class _HomepageState extends State<Homepage> {
             color: Color(0xFFF7F7FF), // Placeholder for additional content
             child: Center(
                 child: SvgPicture.asset(
-              'images/logo.svg',
+              'assets/images/logo.svg',
               width: 100,
               height: 100,
               colorFilter: ColorFilter.mode(

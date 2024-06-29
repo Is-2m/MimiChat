@@ -2,7 +2,7 @@ import 'package:mimichat/utils/AppStateManager.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 
 class WsStompConfig {
-  static String WS_URL = 'ws://${AppStateManager.HOST}/ws';
+  static String WS_URL = '${AppStateManager.socketUrl}';
 
   static final stompClient = StompClient(
     config: StompConfig(

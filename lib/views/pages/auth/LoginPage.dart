@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SvgPicture.asset('images/logo.svg',
+                    SvgPicture.asset('assets/images/logo.svg',
                         width: 30,
                         height: 30,
                         colorFilter: ColorFilter.mode(

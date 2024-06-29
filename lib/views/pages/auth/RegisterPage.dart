@@ -56,7 +56,7 @@ class _RegisterpageState extends State<Registerpage> {
 
   @override
   Widget build(BuildContext context) {
-Size size = MediaQuery.of(context).size;
+    Size size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -71,7 +71,7 @@ Size size = MediaQuery.of(context).size;
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SvgPicture.asset('images/logo.svg',
+                    SvgPicture.asset('assets/images/logo.svg',
                         width: 30,
                         height: 30,
                         colorFilter: ColorFilter.mode(

@@ -8,13 +8,27 @@ import 'package:mimichat/services/CallService.dart';
 import 'package:mimichat/services/ImageService.dart';
 import 'package:provider/provider.dart';
 
-class IncomingCall extends StatelessWidget {
+class IncomingCall extends StatefulWidget {
   final CallHistory call;
   bool camera = false;
   String callUrl = "";
   IncomingCall({super.key, required this.call, this.camera = false}) {
     callUrl = CallService.getCallURL(
         call.roomId, call.receiver.id, call.receiver.username, camera);
+  }
+
+  @override
+  State<IncomingCall> createState() => _IncomingCallState();
+}
+
+class _IncomingCallState extends State<IncomingCall> {
+  Future<Uint8List?>? _imageFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _imageFuture = ImageService.getImage(widget.call.caller.profilePicture!);
   }
 
   @override
@@ -37,7 +51,8 @@ class IncomingCall extends StatelessWidget {
               Transform.scale(
                 scale: width > 500 ? 1 : 0.7,
                 child: FutureBuilder<Uint8List?>(
-                  future: ImageService.getImage(call.caller.profilePicture!),
+                  future:
+                      ImageService.getImage(widget.call.caller.profilePicture!),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
@@ -98,7 +113,7 @@ class IncomingCall extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${call.caller.fullName}",
+                      "${widget.call.caller.fullName}",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -123,8 +138,8 @@ class IncomingCall extends StatelessWidget {
                 onTap: () async {
                   Provider.of<CallProvider>(context, listen: true)
                       .incomingCall = null;
-                  await CallService.updateCall(call);
-                  CallService.makeCall(callUrl);
+                  await CallService.updateCall(widget.call);
+                  CallService.makeCall(widget.callUrl);
                 },
                 child: Container(
                     padding: EdgeInsets.all(10),

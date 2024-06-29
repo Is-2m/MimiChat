@@ -8,10 +8,12 @@ class AppStateManager {
   static String VVCall_signIn =
       "715fd0ae2eda4f27f17d2dd5b32514ba58d3bfdf634794d841645b03e5f79026";
 
-  static final String apiURL = "http://$HOST/api";
-  static final String videoUrl = "http://$HOST/videocall.html";
+  static final String apiURL = "$protocol://$HOST/api";
+  static final String videoUrl = "$protocol://$HOST/videocall.html";
 
-  static final String HOST = "192.168.1.100:8080";
+  static final String protocol = "https";
+  static final String socketUrl = "wss://$HOST/ws";
+  static final String HOST = "mimichat-backend.onrender.com";
 
   static SharedPreferences? _cache;
   static final String _currentUser_CacheName = "currentUser";
