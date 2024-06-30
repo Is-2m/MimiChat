@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mimichat/models/CallHistory.dart';
 import 'package:mimichat/providers/CallProvider.dart';
 import 'package:mimichat/services/CallService.dart';
-import 'package:mimichat/services/ImageService.dart';
 import 'package:provider/provider.dart';
 
 class IncomingCall extends StatefulWidget {
@@ -22,18 +22,21 @@ class IncomingCall extends StatefulWidget {
 }
 
 class _IncomingCallState extends State<IncomingCall> {
-  Future<Uint8List?>? _imageFuture;
+  // Future<Uint8List?>? _imageFuture;
 
   @override
   void initState() {
     super.initState();
 
-    _imageFuture = ImageService.getImage(widget.call.caller.profilePicture!);
+    // _imageFuture = ImageService.getImage(widget.call.caller.profilePicture!);
   }
 
+  int i = 0;
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
+    print("[IncomingCall] rebuild $i");
+    i++;
     return Container(
       padding: EdgeInsets.all(20),
       width: width > 500 ? 350 : width * 0.7,
@@ -49,59 +52,88 @@ class _IncomingCallState extends State<IncomingCall> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Transform.scale(
-                scale: width > 500 ? 1 : 0.7,
-                child: FutureBuilder<Uint8List?>(
-                  future:
-                      ImageService.getImage(widget.call.caller.profilePicture!),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (snapshot.hasData) {
-                      return AvatarGlow(
-                        child: Material(
-                          // Replace this child with your own
-                          elevation: 8.0,
-                          shape: CircleBorder(),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.grey[100],
-                            backgroundImage: MemoryImage(snapshot.data!),
-                            radius: 30.0,
-                          ),
-                        ),
-                      );
-                      // return Image.memory(snapshot.data!);
-                    } else {
-                      return AvatarGlow(
-                        animate: true,
-                        child: Material(
-                          elevation: 8.0,
-                          shape: CircleBorder(),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.grey[100],
-                            child: Icon(Icons.person),
-                            radius: 30.0,
-                          ),
-                        ),
-                      );
-                      // ClipRRect(
-                      //   borderRadius: BorderRadius.all(Radius.circular(50)),
-                      //   child: Material(
-                      //     elevation: 2,
-                      //     child: Container(
-                      //       padding: EdgeInsets.all(2),
-                      //       child: CircleAvatar(
-                      //         radius: 50,
-                      //         backgroundImage:
-                      //             AssetImage("images/user-placeholder.jpg"),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // );
-                    }
-                  },
+                scale: width > 500 ? 0.7 : 0.5,
+                child: AvatarGlow(
+                  child: Material(
+                    elevation: 8,
+                    shape: CircleBorder(),
+                    child: CircleAvatar(
+                      radius: 50,
+                      child: ExtendedImage.network(
+                        widget.call.caller.profilePicture!,
+                        fit: BoxFit.cover,
+                        cache: true,
+                        shape: BoxShape.circle,
+                        loadStateChanged: (ExtendedImageState state) {
+                          switch (state.extendedImageLoadState) {
+                            case LoadState.loading:
+                              return CircularProgressIndicator();
+                            case LoadState.completed:
+                              return ExtendedRawImage(
+                                image: state.extendedImageInfo?.image,
+                                fit: BoxFit.cover,
+                              );
+                            case LoadState.failed:
+                              return Icon(Icons.person);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
                 ),
+
+                // FutureBuilder<Uint8List?>(
+                //   future:
+                //       ImageService.getImage(widget.call.caller.profilePicture!),
+                //   builder: (context, snapshot) {
+                //     if (snapshot.connectionState == ConnectionState.waiting) {
+                //       return CircularProgressIndicator();
+                //     } else if (snapshot.hasError) {
+                //       return Text('Error: ${snapshot.error}');
+                //     } else if (snapshot.hasData) {
+                //       return AvatarGlow(
+                //         child: Material(
+                //           // Replace this child with your own
+                //           elevation: 8.0,
+                //           shape: CircleBorder(),
+                //           child: CircleAvatar(
+                //             backgroundColor: Colors.grey[100],
+                //             backgroundImage: MemoryImage(snapshot.data!),
+                //             radius: 30.0,
+                //           ),
+                //         ),
+                //       );
+                //       // return Image.memory(snapshot.data!);
+                //     } else {
+                //       return AvatarGlow(
+                //         animate: true,
+                //         child: Material(
+                //           elevation: 8.0,
+                //           shape: CircleBorder(),
+                //           child: CircleAvatar(
+                //             backgroundColor: Colors.grey[100],
+                //             child: Icon(Icons.person),
+                //             radius: 30.0,
+                //           ),
+                //         ),
+                //       );
+                //       // ClipRRect(
+                //       //   borderRadius: BorderRadius.all(Radius.circular(50)),
+                //       //   child: Material(
+                //       //     elevation: 2,
+                //       //     child: Container(
+                //       //       padding: EdgeInsets.all(2),
+                //       //       child: CircleAvatar(
+                //       //         radius: 50,
+                //       //         backgroundImage:
+                //       //             AssetImage("images/user-placeholder.jpg"),
+                //       //       ),
+                //       //     ),
+                //       //   ),
+                //       // );
+                //     }
+                //   },
+                // ),
               ),
               SizedBox(width: width > 500 ? 10 : 5),
               Expanded(
@@ -133,7 +165,8 @@ class _IncomingCallState extends State<IncomingCall> {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () async {
-                  Provider.of<CallProvider>(context).removeIncomingCall();
+                  Provider.of<CallProvider>(context, listen: false)
+                      .removeIncomingCall();
                   await CallService.updateCall(widget.call);
                   CallService.makeCall(widget.callUrl);
                 },
@@ -158,7 +191,8 @@ class _IncomingCallState extends State<IncomingCall> {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () {
-                  Provider.of<CallProvider>(context).removeIncomingCall();
+                  Provider.of<CallProvider>(context, listen: false)
+                      .removeIncomingCall();
                 },
                 child: Container(
                     padding: EdgeInsets.all(10),

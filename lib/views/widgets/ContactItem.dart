@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mimichat/models/Friendship.dart';
@@ -15,7 +16,7 @@ class ContactItem extends StatefulWidget {
 
 class _ContactItemState extends State<ContactItem> {
   late User otherUser;
-  Future<Uint8List?>? _imageFuture;
+  // Future<Uint8List?>? _imageFuture;
   @override
   void initState() {
     super.initState();
@@ -23,7 +24,7 @@ class _ContactItemState extends State<ContactItem> {
         widget.friendship.sender.isSamePersonAs(AppStateManager.currentUser!)
             ? widget.friendship.receiver
             : widget.friendship.sender;
-    _imageFuture = ImageService.getImage(otherUser.profilePicture!);
+    // _imageFuture = ImageService.getImage(otherUser.profilePicture!);
   }
 
   @override
@@ -53,26 +54,48 @@ class _ContactItemState extends State<ContactItem> {
           leading: Container(
             child: Transform.scale(
               scale: 1.1,
-              child: FutureBuilder<Uint8List?>(
-                future: _imageFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return CircleAvatar(
-                      child: Icon(Icons.person),
-                    );
-                  } else if (snapshot.hasData) {
-                    return CircleAvatar(
-                      backgroundImage: MemoryImage(snapshot.data!),
-                    );
-                  } else {
-                    return CircleAvatar(
-                      child: Icon(Icons.person),
-                    );
-                  }
-                },
-              ),
+              child: CircleAvatar(
+                  radius: 50,
+                  child: ExtendedImage.network(
+                    otherUser.profilePicture!,
+                    fit: BoxFit.cover,
+                    cache: true,
+                    shape: BoxShape.circle,
+                    loadStateChanged: (ExtendedImageState state) {
+                      switch (state.extendedImageLoadState) {
+                        case LoadState.loading:
+                          return CircularProgressIndicator();
+                        case LoadState.completed:
+                          return ExtendedRawImage(
+                            image: state.extendedImageInfo?.image,
+                            fit: BoxFit.cover,
+                          );
+                        case LoadState.failed:
+                          return Icon(Icons.person);
+                      }
+                    },
+                  ),
+                ),
+              // FutureBuilder<Uint8List?>(
+              //   future: _imageFuture,
+              //   builder: (context, snapshot) {
+              //     if (snapshot.connectionState == ConnectionState.waiting) {
+              //       return CircularProgressIndicator();
+              //     } else if (snapshot.hasError) {
+              //       return CircleAvatar(
+              //         child: Icon(Icons.person),
+              //       );
+              //     } else if (snapshot.hasData) {
+              //       return CircleAvatar(
+              //         backgroundImage: MemoryImage(snapshot.data!),
+              //       );
+              //     } else {
+              //       return CircleAvatar(
+              //         child: Icon(Icons.person),
+              //       );
+              //     }
+              //   },
+              // ),
             ),
           )),
     );

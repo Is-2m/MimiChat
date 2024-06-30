@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/User.dart';
@@ -157,48 +158,78 @@ class _ContactsPageState extends State<ContactsPage> {
                                             alignment: Alignment.topCenter,
                                             child: Transform.scale(
                                               scale: 0.8,
-                                              child: FutureBuilder<Uint8List?>(
-                                                future: ImageService.getImage(
-                                                    currChat
-                                                        .getOtherUser()
-                                                        .profilePicture!),
-                                                builder: (context, snapshot) {
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return CircularProgressIndicator();
-                                                  } else if (snapshot
-                                                      .hasError) {
-                                                    return Container(
-                                                      padding:
-                                                          EdgeInsets.all(2),
-                                                      child: CircleAvatar(
-                                                        radius: 50,
-                                                        child:
-                                                            Icon(Icons.person),
-                                                      ),
-                                                    );
-                                                  } else if (snapshot.hasData) {
-                                                    return CircleAvatar(
-                                                      radius: 50,
-                                                      backgroundImage:
-                                                          MemoryImage(
-                                                              snapshot.data!),
-                                                    );
-                                                    // return Image.memory(snapshot.data!);
-                                                  } else {
-                                                    return Container(
-                                                      padding:
-                                                          EdgeInsets.all(2),
-                                                      child: CircleAvatar(
-                                                        radius: 50,
-                                                        child:
-                                                            Icon(Icons.person),
-                                                      ),
-                                                    );
-                                                  }
-                                                },
+                                              child: CircleAvatar(
+                                                radius: 50,
+                                                child: ExtendedImage.network(
+                                                  currChat
+                                                      .getOtherUser()
+                                                      .profilePicture!,
+                                                  fit: BoxFit.cover,
+                                                  cache: true,
+                                                  shape: BoxShape.circle,
+                                                  loadStateChanged:
+                                                      (ExtendedImageState
+                                                          state) {
+                                                    switch (state
+                                                        .extendedImageLoadState) {
+                                                      case LoadState.loading:
+                                                        return CircularProgressIndicator();
+                                                      case LoadState.completed:
+                                                        return ExtendedRawImage(
+                                                          image: state
+                                                              .extendedImageInfo
+                                                              ?.image,
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      case LoadState.failed:
+                                                        return Icon(
+                                                            Icons.person);
+                                                    }
+                                                  },
+                                                ),
                                               ),
+                                              // FutureBuilder<Uint8List?>(
+                                              //   future: ImageService.getImage(
+                                              //       currChat
+                                              //           .getOtherUser()
+                                              //           .profilePicture!),
+                                              //   builder: (context, snapshot) {
+                                              //     if (snapshot
+                                              //             .connectionState ==
+                                              //         ConnectionState.waiting) {
+                                              //       return CircularProgressIndicator();
+                                              //     } else if (snapshot
+                                              //         .hasError) {
+                                              //       return Container(
+                                              //         padding:
+                                              //             EdgeInsets.all(2),
+                                              //         child: CircleAvatar(
+                                              //           radius: 50,
+                                              //           child:
+                                              //               Icon(Icons.person),
+                                              //         ),
+                                              //       );
+                                              //     } else if (snapshot.hasData) {
+                                              //       return CircleAvatar(
+                                              //         radius: 50,
+                                              //         backgroundImage:
+                                              //             MemoryImage(
+                                              //                 snapshot.data!),
+                                              //       );
+                                              //       // return Image.memory(snapshot.data!);
+                                              //     } else {
+                                              //       return Container(
+                                              //         padding:
+                                              //             EdgeInsets.all(2),
+                                              //         child: CircleAvatar(
+                                              //           radius: 50,
+                                              //           child:
+                                              //               Icon(Icons.person),
+                                              //         ),
+                                              //       );
+                                              //     }
+                                              //   },
+                                              // ),
                                             ),
                                           ),
                                         ],

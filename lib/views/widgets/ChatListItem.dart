@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mimichat/models/Chat.dart';
 import 'package:mimichat/models/Message.dart';
@@ -20,15 +21,18 @@ class ChatListItem extends StatefulWidget {
 
 class _ChatListItemState extends State<ChatListItem> {
   User currentUser = AppStateManager.currentUser!;
-  Future<Uint8List?>? _imageFuture;
+  // Future<Uint8List?>? _imageFuture;
+  String url = "";
   @override
   void initState() {
     super.initState();
     if (AppStateManager.currentUser!.id == widget.chat.sender.id) {
-      _imageFuture =
-          ImageService.getImage(widget.chat.receiver.profilePicture!);
-    }else{
-      _imageFuture = ImageService.getImage(widget.chat.sender.profilePicture!);
+      url = widget.chat.receiver.profilePicture!;
+      // _imageFuture =
+      // ImageService.getImage(widget.chat.receiver.profilePicture!);
+    } else {
+      url = widget.chat.sender.profilePicture!;
+      // _imageFuture = ImageService.getImage(widget.chat.sender.profilePicture!);
     }
   }
 
@@ -74,26 +78,48 @@ class _ChatListItemState extends State<ChatListItem> {
           leading: Container(
             child: Transform.scale(
               scale: 1.1,
-              child: FutureBuilder<Uint8List?>(
-                future: _imageFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return CircleAvatar(
-                      child: Icon(Icons.error),
-                    );
-                  } else if (snapshot.hasData) {
-                    return CircleAvatar(
-                      backgroundImage: MemoryImage(snapshot.data!),
-                    );
-                  } else {
-                    return CircleAvatar(
-                      child: Icon(Icons.person),
-                    );
-                  }
-                },
+              child: CircleAvatar(
+                radius: 50,
+                child: ExtendedImage.network(
+                  url,
+                  fit: BoxFit.cover,
+                  cache: true,
+                  shape: BoxShape.circle,
+                  loadStateChanged: (ExtendedImageState state) {
+                    switch (state.extendedImageLoadState) {
+                      case LoadState.loading:
+                        return CircularProgressIndicator();
+                      case LoadState.completed:
+                        return ExtendedRawImage(
+                          image: state.extendedImageInfo?.image,
+                          fit: BoxFit.cover,
+                        );
+                      case LoadState.failed:
+                        return Icon(Icons.person);
+                    }
+                  },
+                ),
               ),
+              // FutureBuilder<Uint8List?>(
+              //   future: _imageFuture,
+              //   builder: (context, snapshot) {
+              //     if (snapshot.connectionState == ConnectionState.waiting) {
+              //       return CircularProgressIndicator();
+              //     } else if (snapshot.hasError) {
+              //       return CircleAvatar(
+              //         child: Icon(Icons.error),
+              //       );
+              //     } else if (snapshot.hasData) {
+              //       return CircleAvatar(
+              //         backgroundImage: MemoryImage(snapshot.data!),
+              //       );
+              //     } else {
+              //       return CircleAvatar(
+              //         child: Icon(Icons.person),
+              //       );
+              //     }
+              //   },
+              // ),
             ),
           )),
     );

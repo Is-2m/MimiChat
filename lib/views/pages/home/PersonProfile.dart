@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mimichat/models/User.dart';
 import 'package:mimichat/services/ImageService.dart';
@@ -15,12 +16,12 @@ class PersonProfile extends StatefulWidget {
 }
 
 class _PersonProfileState extends State<PersonProfile> {
-  Future<Uint8List?>? _imageFuture;
+  // Future<Uint8List?>? _imageFuture;
 
   @override
   void initState() {
     super.initState();
-    _imageFuture = ImageService.getImage(widget.user.profilePicture!);
+    // _imageFuture = ImageService.getImage(widget.user.profilePicture!);
   }
 
   @override
@@ -55,33 +56,56 @@ class _PersonProfileState extends State<PersonProfile> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Transform.scale(
-                  scale: 2,
+                  scale: 1,
                   child: Container(
                     padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
                         color: CustomColors.BG_Grey,
                         borderRadius: BorderRadius.all(Radius.circular(50))),
-                    child: FutureBuilder<Uint8List?>(
-                      future: _imageFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return CircleAvatar(
-                            child: Icon(Icons.error),
-                          );
-                        } else if (snapshot.hasData) {
-                          return CircleAvatar(
-                            backgroundImage: MemoryImage(snapshot.data!),
-                          );
-                        } else {
-                          return CircleAvatar(
-                            child: Icon(Icons.person),
-                          );
-                        }
-                      },
+                    child: CircleAvatar(
+                      radius: 50,
+                      child: ExtendedImage.network(
+                        widget.user.profilePicture!,
+                        fit: BoxFit.cover,
+                        cache: true,
+                        shape: BoxShape.circle,
+                        loadStateChanged: (ExtendedImageState state) {
+                          switch (state.extendedImageLoadState) {
+                            case LoadState.loading:
+                              return CircularProgressIndicator();
+                            case LoadState.completed:
+                              return ExtendedRawImage(
+                                image: state.extendedImageInfo?.image,
+                                fit: BoxFit.cover,
+                              );
+                            case LoadState.failed:
+                              return Icon(Icons.person);
+                          }
+                        },
+                      ),
                     ),
+
+                    // FutureBuilder<Uint8List?>(
+                    //   future: _imageFuture,
+                    //   builder: (context, snapshot) {
+                    //     if (snapshot.connectionState ==
+                    //         ConnectionState.waiting) {
+                    //       return CircularProgressIndicator();
+                    //     } else if (snapshot.hasError) {
+                    //       return CircleAvatar(
+                    //         child: Icon(Icons.error),
+                    //       );
+                    //     } else if (snapshot.hasData) {
+                    //       return CircleAvatar(
+                    //         backgroundImage: MemoryImage(snapshot.data!),
+                    //       );
+                    //     } else {
+                    //       return CircleAvatar(
+                    //         child: Icon(Icons.person),
+                    //       );
+                    //     }
+                    //   },
+                    // ),
                   ),
                 ),
                 Padding(

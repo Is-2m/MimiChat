@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:mimichat/services/ImageService.dart';
@@ -27,14 +28,15 @@ class _RightChatBubbleState extends State<RightChatBubble> {
   Widget build(BuildContext context) {
     Color textColor = Colors.white;
     Color? timeColor = Colors.grey[300];
-  Future<Uint8List?>? _imageFuture;
-  
-  @override
-  void initState() {
-    super.initState();
+    // Future<Uint8List?>? _imageFuture;
 
-    _imageFuture = ImageService.getImage(widget.img);
-  }
+    @override
+    void initState() {
+      super.initState();
+
+      // _imageFuture = ImageService.getImage(widget.img);
+    }
+
     double _countWidth(String msg) {
       int length = msg.split(" ").length;
       var coff = length <= 3
@@ -105,26 +107,51 @@ class _RightChatBubbleState extends State<RightChatBubble> {
               ? SizedBox.shrink()
               : Container(
                   padding: EdgeInsets.only(top: 50),
-                  child: FutureBuilder<Uint8List?>(
-                      future: _imageFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return CircleAvatar(
-                            child: Icon(Icons.error),
-                          );
-                        } else if (snapshot.hasData) {
-                          return CircleAvatar(
-                            backgroundImage: MemoryImage(snapshot.data!),
-                          );
-                        } else {
-                          return CircleAvatar(
-                            child: Icon(Icons.person),
-                          );
-                        }
-                      }),
+                  child: Transform.scale(
+                    scale: 0.5,
+                    child: CircleAvatar(
+                      radius: 50,
+                      child: ExtendedImage.network(
+                        widget.img,
+                        fit: BoxFit.cover,
+                        cache: true,
+                        shape: BoxShape.circle,
+                        loadStateChanged: (ExtendedImageState state) {
+                          switch (state.extendedImageLoadState) {
+                            case LoadState.loading:
+                              return CircularProgressIndicator();
+                            case LoadState.completed:
+                              return ExtendedRawImage(
+                                image: state.extendedImageInfo?.image,
+                                fit: BoxFit.cover,
+                              );
+                            case LoadState.failed:
+                              return Icon(Icons.person);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  // FutureBuilder<Uint8List?>(
+                  //     future: _imageFuture,
+                  //     builder: (context, snapshot) {
+                  //       if (snapshot.connectionState ==
+                  //           ConnectionState.waiting) {
+                  //         return CircularProgressIndicator();
+                  //       } else if (snapshot.hasError) {
+                  //         return CircleAvatar(
+                  //           child: Icon(Icons.error),
+                  //         );
+                  //       } else if (snapshot.hasData) {
+                  //         return CircleAvatar(
+                  //           backgroundImage: MemoryImage(snapshot.data!),
+                  //         );
+                  //       } else {
+                  //         return CircleAvatar(
+                  //           child: Icon(Icons.person),
+                  //         );
+                  //       }
+                  //     }),
                 ),
           SizedBox(
             width: 15,

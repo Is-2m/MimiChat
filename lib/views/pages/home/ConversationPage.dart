@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mimichat/models/CallHistory.dart';
 import 'package:mimichat/models/CallState.dart';
@@ -194,26 +195,51 @@ Widget _mainWidget(
                         selChaProvider.closeChat();
                       },
                       icon: Icon(Icons.arrow_back_ios))),
-              FutureBuilder<Uint8List?>(
-                  future: ImageService.getImage(otherUser.profilePicture!),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return CircleAvatar(
-                        child: Icon(Icons.error),
-                      );
-                    } else if (snapshot.hasData) {
-                      return CircleAvatar(
-                        radius: 20,
-                        backgroundImage: MemoryImage(snapshot.data!),
-                      );
-                    } else {
-                      return CircleAvatar(
-                        child: Icon(Icons.person),
-                      );
-                    }
-                  }),
+              Transform.scale(
+                scale: 0.8,
+                child: CircleAvatar(
+                  radius: 50,
+                  child: ExtendedImage.network(
+                    otherUser.profilePicture!,
+                    fit: BoxFit.cover,
+                    cache: true,
+                    shape: BoxShape.circle,
+                    loadStateChanged: (ExtendedImageState state) {
+                      switch (state.extendedImageLoadState) {
+                        case LoadState.loading:
+                          return CircularProgressIndicator();
+                        case LoadState.completed:
+                          return ExtendedRawImage(
+                            image: state.extendedImageInfo?.image,
+                            fit: BoxFit.cover,
+                          );
+                        case LoadState.failed:
+                          return Icon(Icons.person);
+                      }
+                    },
+                  ),
+                ),
+              ),
+              // FutureBuilder<Uint8List?>(
+              //     future: ImageService.getImage(otherUser.profilePicture!),
+              //     builder: (context, snapshot) {
+              //       if (snapshot.connectionState == ConnectionState.waiting) {
+              //         return CircularProgressIndicator();
+              //       } else if (snapshot.hasError) {
+              //         return CircleAvatar(
+              //           child: Icon(Icons.error),
+              //         );
+              //       } else if (snapshot.hasData) {
+              //         return CircleAvatar(
+              //           radius: 20,
+              //           backgroundImage: MemoryImage(snapshot.data!),
+              //         );
+              //       } else {
+              //         return CircleAvatar(
+              //           child: Icon(Icons.person),
+              //         );
+              //       }
+              //     }),
               SizedBox(
                 width: 5,
               ),
