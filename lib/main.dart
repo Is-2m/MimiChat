@@ -9,7 +9,6 @@ import 'package:mimichat/views/pages/auth/Wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +19,6 @@ void main() async {
 
   await SharedPreferences.getInstance().then((cache) {
     AppStateManager.setCache(cache);
-
 
     runApp(
       MultiProvider(
