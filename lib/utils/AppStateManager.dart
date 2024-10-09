@@ -4,9 +4,9 @@ import 'package:mimichat/models/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStateManager {
-  static int VVCall_ID = 1137855613;
+  static int VVCall_ID = 1076254653;
   static String VVCall_signIn =
-      "715fd0ae2eda4f27f17d2dd5b32514ba58d3bfdf634794d841645b03e5f79026";
+      "7a5a56e4b40a6cb280eaf753104954f0f75380cd6a3386c56c79ab7dab317cbd";
 
   static final String apiURL = "$protocol://$HOST/api";
   static final String videoUrl = "$protocol://$HOST/videocall.html";
