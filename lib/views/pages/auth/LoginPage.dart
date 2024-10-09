@@ -41,6 +41,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void initState() {
+    _emailController.text = "public.test.user@example.com";
+    _passwordController.text = "1234567890";
+    super.initState();
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
